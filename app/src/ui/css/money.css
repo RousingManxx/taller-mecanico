@@ -1,0 +1,29 @@
+/* Ventas, cobros, caja, gastos y cobranza (clases con prefijo mny-) */
+.mny-line { border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px; background: var(--surface-3); display: flex; flex-direction: column; gap: 10px; }
+.mny-line-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 700px) { .mny-line-grid { grid-template-columns: repeat(4, 1fr); } }
+.mny-res { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 12px; cursor: pointer; min-height: 44px; color: inherit; }
+.mny-res:hover, .mny-res:focus-visible { border-color: var(--accent); }
+.mny-results { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.mny-sum { border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; background: var(--surface-3); display: flex; flex-direction: column; gap: 4px; }
+.mny-kv { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.mny-kv.total { font-weight: 700; font-size: 1.1rem; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px; }
+.mny-kv > span:first-child { color: var(--text-2); }
+.mny-kv.total > span:first-child { color: var(--text); }
+.mny-big { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.02em; }
+.mny-due { display: flex; flex-direction: column; gap: 10px; }
+.mny-due-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.mny-doc { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line); }
+.mny-doc:first-of-type { border-top: 0; }
+.mny-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.mny-sticky-sum { position: sticky; bottom: 0; }
+.mny-tabs { margin-bottom: 4px; }
+.mny-pickrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mny-check { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); min-height: 44px; }
+.mny-check label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.mny-sep { border: 0; border-top: 1px solid var(--line); margin: 4px 0; }
+.mny-group { display: flex; flex-direction: column; gap: 6px; }
+.mny-group h4 { margin: 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-2); }
+.mny-main { display: grid; gap: var(--s4); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.mny-main > * { min-width: 0; }
+@media (min-width: 1100px) { .mny-main { grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); } }

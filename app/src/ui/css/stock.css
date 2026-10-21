@@ -1,0 +1,95 @@
+/* Inventario y compras: clases con prefijo stk- (no modifican index.css). */
+.stk-tools { display: grid; gap: var(--s3); grid-template-columns: 1fr; }
+@media (min-width: 700px) { .stk-tools { grid-template-columns: 2fr 1fr 1fr 1fr; align-items: end; } }
+.stk-tools.t3 { grid-template-columns: 1fr; }
+@media (min-width: 700px) { .stk-tools.t3 { grid-template-columns: 2fr 1fr 1fr; } }
+.stk-tools.t5 { grid-template-columns: 1fr 1fr; }
+@media (min-width: 900px) { .stk-tools.t5 { grid-template-columns: 2fr 1.2fr 1.2fr 1fr 1fr; align-items: end; } }
+.stk-name { font-weight: 600; } .stk-sub { font-size: 0.78rem; color: var(--text-2); font-weight: 400; }
+.stk-mono { font-family: var(--mono); font-size: 0.8rem; }
+
+/* Tarjetas con acciones (lista adaptable con botones en cada fila) */
+.stk-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.stk-cardmain { background: none; border: 0; padding: 0; text-align: left; width: 100%; color: inherit; font: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+.stk-cardmain:hover b { color: var(--accent-strong); }
+.stk-card .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 0.86rem; } .stk-card .kv > span:first-child { color: var(--text-2); }
+.stk-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.table td.stk-actcell { text-align: right; white-space: nowrap; } .table td.stk-actcell .stk-acts { flex-wrap: nowrap; }
+
+/* Ficha */
+.stk-dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin: 0; }
+@media (min-width: 700px) { .stk-dl { grid-template-columns: repeat(3, 1fr); } }
+.stk-dl dt { font-size: 0.74rem; color: var(--text-2); font-weight: 600; } .stk-dl dd { margin: 2px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.stk-dl .wide { grid-column: 1 / -1; }
+.stk-sec { display: flex; flex-direction: column; gap: var(--s2); padding-top: var(--s3); border-top: 1px solid var(--line); }
+.stk-sec:first-child { border-top: 0; padding-top: 0; }
+.stk-sec > h3 { font-size: 0.92rem; }
+.stk-mini { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.stk-mini th { text-align: left; font-size: 0.72rem; color: var(--text-2); font-weight: 600; padding: 4px 6px; text-transform: uppercase; letter-spacing: 0.03em; }
+.stk-mini td { padding: 6px; border-top: 1px solid var(--line); vertical-align: top; }
+.stk-mini .r { text-align: right; }
+.stk-scroll { overflow-x: auto; }
+
+/* Alertas */
+.stk-agrp { display: flex; flex-direction: column; gap: var(--s2); }
+.stk-agrp > header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.stk-agrp .def { font-size: 0.8rem; color: var(--text-2); margin: 0; }
+.stk-arow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); flex-wrap: wrap; }
+.stk-arow .info { flex: 1 1 220px; min-width: 0; }
+.stk-arow .info button.lnk { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent-strong); cursor: pointer; text-align: left; }
+.stk-arow .info button.lnk:hover { text-decoration: underline; }
+
+/* Propuesta de compra (filas editables) */
+.stk-prow { display: grid; gap: 8px 12px; padding: 12px 0; border-top: 1px solid var(--line); grid-template-columns: 1fr 1fr; align-items: end; }
+.stk-prow:first-of-type { border-top: 0; }
+.stk-prow .nm { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  .stk-prow { grid-template-columns: minmax(180px, 2.2fr) 0.9fr 0.8fr 1fr 1.7fr 1fr 1fr; align-items: center; padding: 8px 0; }
+  .stk-prow .nm { grid-column: auto; }
+  .stk-prow.head { font-size: 0.72rem; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; padding-bottom: 4px; }
+}
+.stk-prow .lbl { font-size: 0.74rem; color: var(--text-2); font-weight: 600; display: block; }
+@media (min-width: 900px) { .stk-prow .lbl { display: none; } }
+.stk-prow.head { display: none; } @media (min-width: 900px) { .stk-prow.head { display: grid; } }
+.stk-prow .r { text-align: right; }
+
+/* Partidas de compra (formulario) y recepciones */
+.stk-line { display: grid; gap: 8px; padding: 12px; background: var(--surface-3); border: 1px solid var(--line); border-radius: var(--r-md); grid-template-columns: 1fr 1fr; }
+.stk-line .full { grid-column: 1 / -1; }
+.stk-line .tot { display: flex; justify-content: space-between; align-items: center; grid-column: 1 / -1; font-size: 0.86rem; }
+.stk-recv { display: grid; gap: 8px 12px; padding: 10px 0; border-top: 1px solid var(--line); grid-template-columns: 1fr 1fr; }
+.stk-recv:first-of-type { border-top: 0; }
+.stk-recv .full { grid-column: 1 / -1; }
+.stk-totals { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; font-size: 0.9rem; max-width: 380px; margin-left: auto; width: 100%; }
+.stk-totals .big { font-weight: 800; font-size: 1.05rem; border-top: 1px solid var(--line); padding-top: 4px; }
+.stk-totals span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Conteo físico */
+.stk-count { display: grid; grid-template-columns: 1fr 96px; gap: 4px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.stk-count > label { grid-column: 2; grid-row: 1 / span 2; }
+.stk-count .meta { grid-column: 1; display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-2); }
+.stk-count.head { display: none; }
+@media (min-width: 700px) {
+  .stk-count { grid-template-columns: minmax(180px, 2fr) 0.9fr 120px 0.9fr 0.9fr; }
+  .stk-count > label { grid-column: auto; grid-row: auto; order: 3; }
+  .stk-count > div:first-child { order: 1; }
+  .stk-count .meta { display: contents; }
+  .stk-count .meta > span { font-size: 0.88rem; color: var(--text); }
+  .stk-count .meta > span:nth-child(1) { order: 2; } .stk-count .meta > span:nth-child(2) { order: 4; } .stk-count .meta > span:nth-child(3) { order: 5; }
+  .stk-count .pre { display: none; }
+  .stk-count.head { display: grid; font-size: 0.72rem; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; border-top: 0; }
+}
+.stk-count .r { text-align: right; }
+
+/* Comparación de precios */
+.stk-best { background: var(--ok-soft); }
+.stk-best td { font-weight: 700; }
+
+/* Pagos a proveedores */
+.stk-pay { display: grid; grid-template-columns: 24px 1fr; gap: 6px 10px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
+.stk-pay:first-of-type { border-top: 0; }
+.stk-pay .amt { grid-column: 2; max-width: 220px; }
+
+.stk-lnk { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--accent-strong); cursor: pointer; text-align: left; } .stk-lnk:hover { text-decoration: underline; }
+
+.stk-hm { display: none; } @media (min-width: 700px) { th.stk-hm, td.stk-hm { display: table-cell; } }

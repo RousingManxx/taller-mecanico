@@ -1,0 +1,79 @@
+/* Órdenes de trabajo — estilos propios (prefijo ord-). Usa las variables de index.css. */
+
+/* ───── Selector buscable ───── */
+.ord-opts { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.ord-opt { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left; min-height: 44px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); cursor: pointer; color: inherit; }
+.ord-opt:hover, .ord-opt:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+.ord-opt .t { font-weight: 600; } .ord-opt .s { font-size: 0.8rem; color: var(--text-2); }
+.ord-opt .r { text-align: right; font-size: 0.82rem; white-space: nowrap; }
+.ord-picked { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--accent-soft); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.ord-picked .t { font-weight: 700; color: var(--accent-strong); } .ord-picked .s { font-size: 0.82rem; color: var(--text-2); }
+
+/* ───── Secciones de formularios ───── */
+.ord-sec { border-top: 1px solid var(--line); padding-top: var(--s3); margin-top: var(--s3); }
+.ord-sec:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+.ord-sec > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; min-height: 36px; }
+.ord-sec > summary::-webkit-details-marker { display: none; }
+.ord-sec > summary h3 { font-size: 1rem; }
+.ord-sec > summary::after { content: "▾"; color: var(--text-2); }
+.ord-sec[open] > summary::after { content: "▴"; }
+.ord-sec > .stack { margin-top: var(--s3); }
+.ord-form-grid { display: grid; gap: var(--s3); grid-template-columns: 1fr; }
+@media (min-width: 700px) { .ord-form-grid { grid-template-columns: 1fr 1fr; } .ord-form-grid .full { grid-column: 1 / -1; } }
+
+/* ───── Lista y tablero ───── */
+.ord-filters { display: grid; gap: var(--s3); grid-template-columns: 1fr; }
+@media (min-width: 700px) { .ord-filters { grid-template-columns: 2fr 1fr 1fr; align-items: end; } }
+.ord-kcard { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); text-decoration: none; color: inherit; }
+.ord-kcard:hover, .ord-kcard:focus-visible { border-color: var(--accent); }
+.ord-kcard .f { font-weight: 700; } .ord-kcard .m { font-size: 0.82rem; color: var(--text-2); }
+.ord-overdue { color: var(--bad); font-weight: 700; }
+
+/* ───── Detalle ───── */
+.ord-head { display: flex; flex-direction: column; gap: var(--s3); }
+.ord-meta { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.ord-meta .l { font-size: 0.74rem; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.ord-meta .v { font-weight: 600; word-break: break-word; }
+.ord-steps { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.ord-steps > li { list-style: none; flex: 1; min-width: 78px; text-align: center; font-size: 0.72rem; font-weight: 600; padding: 7px 4px; border-radius: 8px; background: var(--surface-2); color: var(--text-2); }
+.ord-steps > li.done { background: var(--accent-soft); color: var(--accent-strong); }
+.ord-steps > li.cur { background: var(--accent); color: var(--on-accent); }
+.ord-steps { margin: 0; padding: 0; }
+.ord-trans { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.ord-trans > div { display: flex; flex-direction: column; gap: 4px; }
+.ord-trans .why { font-size: 0.78rem; color: var(--bad); line-height: 1.3; }
+.ord-file:focus-within { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+
+/* ───── Partidas ───── */
+.ord-line { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: 8px; }
+.ord-line.rej { opacity: 0.75; }
+.ord-line .top { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+.ord-line .desc { font-weight: 700; word-break: break-word; }
+.ord-line .nums { display: grid; gap: 6px 16px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); font-size: 0.86rem; }
+.ord-line .nums .l { font-size: 0.72rem; color: var(--text-2); display: block; }
+.ord-line .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.ord-line .info { font-size: 0.82rem; color: var(--text-2); }
+.ord-totals { display: grid; gap: 6px; }
+.ord-totals > div { display: flex; justify-content: space-between; gap: 12px; }
+.ord-totals .big { font-size: 1.15rem; font-weight: 700; border-top: 1px solid var(--line); padding-top: 6px; }
+
+/* ───── Tiempos ───── */
+.ord-timer { font-family: var(--mono); font-size: 1.6rem; font-weight: 700; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.ord-run { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px; border-radius: var(--r-md); background: var(--ok-soft); }
+
+/* ───── Finanzas ───── */
+.ord-fin { display: flex; flex-direction: column; }
+.ord-fin .r { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+.ord-fin .r:first-child { border-top: 0; }
+.ord-fin .r .why { display: block; font-size: 0.78rem; color: var(--text-2); font-weight: 400; margin-top: 2px; }
+.ord-fin .r.sum { font-weight: 700; background: var(--surface-3); padding-inline: 8px; border-radius: 6px; }
+.ord-fin .r .a { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ───── Fotos ───── */
+.ord-thumbs { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.ord-thumb { position: relative; border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; background: var(--surface-3); aspect-ratio: 1; }
+.ord-thumb > button.open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.ord-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ord-thumb .rm { position: absolute; top: 4px; right: 4px; }
+.ord-thumb .pdf { display: grid; place-items: center; height: 100%; font-weight: 700; color: var(--text-2); font-size: 0.82rem; text-align: center; padding: 6px; }
+.ord-bigimg { max-width: 100%; max-height: 70vh; display: block; margin: 0 auto; border-radius: var(--r-sm); }
