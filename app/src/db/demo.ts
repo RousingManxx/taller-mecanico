@@ -47,7 +47,7 @@ export interface DemoProgress { (done: number, total: number, label: string): vo
 export async function createDemoOrganization(days = 40, onProgress: DemoProgress = () => {}): Promise<Ctx> {
   const rnd = rng(20260310)
   const pick = <T,>(a: readonly T[]) => a[Math.floor(rnd() * a.length)]
-  const base = new Date(); base.setUTCHours(15, 0, 0, 0)
+  const base = new Date(Date.now() - 10 * 3600000) // anclado a la hora actual: ningún evento queda en el futuro, sin importar la zona horaria
   const start = new Date(base.getTime() - days * 86400000)
   let t = start
   const ctx = await createOrganization({ name: 'Taller Demo (datos ficticios)', ownerName: 'Propietario Demo', pin: '1234', demo: true, now: () => t })
@@ -108,7 +108,7 @@ export async function createDemoOrganization(days = 40, onProgress: DemoProgress
     await generateRecurring(ctx)
     if (wd === 0) { onProgress(5 + Math.round((d / days) * 90), 100, `Día ${d + 1} de ${days}`); continue }
     await day(d, 0, 10)
-    await openSession(ctx, 100_000)
+    if (!(await currentSession(ctx))) await openSession(ctx, 100_000)
     const recent = days - d <= 2
     const nOrders = 1 + Math.floor(rnd() * 3)
     for (let k = 0; k < nOrders; k++) {

@@ -6,6 +6,7 @@ import type { Permission } from './domain/permissions'
 import { ROLE_LABEL } from './domain/permissions'
 import { Agenda } from './pages/Agenda'
 import { Ajustes } from './pages/Ajustes'
+import { Ayuda } from './pages/Ayuda'
 import { Caja } from './pages/Caja'
 import { ClienteFicha } from './pages/ClienteFicha'
 import { Clientes } from './pages/Clientes'
@@ -31,6 +32,7 @@ import { Welcome } from './pages/Welcome'
 import { buildAlerts } from './ui/alerts'
 import { SheetHost, useOpen, type Sheet as SheetKind } from './ui/create'
 import { useData, type Data } from './ui/data'
+import { InstallBanner } from './ui/install'
 import { SearchPanel } from './ui/search'
 import { SessionProvider, useSession } from './ui/session'
 import { Icon, Sheet, UiProvider } from './ui/ui'
@@ -53,6 +55,7 @@ const NAV: NavItem[] = [
   { to: '/personal', label: 'Personal', icon: 'users', perm: 'personal.ver', group: 'Equipo' },
   { to: '/reportes', label: 'Reportes', icon: 'chart', perm: ['finanzas.ver', 'ventas.ver', 'inventario.ver'], group: 'Equipo' },
   { to: '/ajustes', label: 'Ajustes', icon: 'gear', group: 'Sistema' },
+  { to: '/ayuda', label: 'Guía de uso', icon: 'info', group: 'Sistema' },
 ]
 const allowedNav = (d: Data, n: NavItem) => !n.perm || (Array.isArray(n.perm) ? n.perm.some((p) => d.can(p)) : d.can(n.perm))
 const QUICK: { k: SheetKind['k']; label: string; icon: string; perm: Permission }[] = [
@@ -120,7 +123,8 @@ function ProfileMenu({ data, onClose }: { data: Data; onClose: () => void }) {
         <div style={{ padding: '8px 12px' }}><b>{user.name}</b><div className="small muted">{ROLE_LABEL[user.role]}</div><div className="small muted">{data.settings.businessName}</div></div>
         <hr />
         <Link role="menuitem" to="/ajustes" onClick={onClose}><Icon n="gear" size={20} />Ajustes</Link>
-        <Link role="menuitem" to="/guia" onClick={onClose}><Icon n="info" size={20} />Guía de inicio</Link>
+        <Link role="menuitem" to="/ayuda" onClick={onClose}><Icon n="info" size={20} />Guía de uso</Link>
+        <Link role="menuitem" to="/guia" onClick={onClose}><Icon n="check" size={20} />Guía de inicio</Link>
         <button role="menuitem" onClick={() => { onClose(); logout() }}><Icon n="logout" size={20} />Cerrar sesión / cambiar de taller</button>
       </div>
     </>
@@ -193,6 +197,7 @@ function Shell() {
           <button className="tab" onClick={() => setPanel('more')} aria-label="Más módulos"><Icon n="more" size={22} /><span>Más</span></button>
         </nav>
         <main className="main">
+          <InstallBanner />
           {org?.demo && <div className="banner info" style={{ marginBottom: 12 }}>Estás en el <b>taller de demostración</b>: todos los datos son ficticios y están separados de tus datos reales. <Link to="/ajustes">Administrar demostración</Link></div>}
           <div className="page" key={loc.pathname}>
             <Routes>
@@ -219,6 +224,7 @@ function Shell() {
               <Route path="/reportes/:id" element={<Guard data={data} perm={['finanzas.ver', 'ventas.ver', 'inventario.ver']}><Reportes data={data} /></Guard>} />
               <Route path="/ajustes" element={<Ajustes data={data} />} />
               <Route path="/guia" element={<Guia data={data} />} />
+              <Route path="/ayuda" element={<Ayuda data={data} />} />
               <Route path="*" element={<Inicio data={data} />} />
             </Routes>
           </div>

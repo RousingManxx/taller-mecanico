@@ -1,0 +1,116 @@
+# Torque — guía de uso
+
+> Generado desde `src/ui/helpContent.ts` (la misma guía está dentro de la app, en el menú del perfil → Guía de uso).
+
+## 1. Primeros pasos
+
+Torque guarda todo en el dispositivo donde la uses y funciona sin internet. Al abrirla elige una opción:
+
+- Crear mi taller: escribe el nombre del taller, tu nombre y un PIN de 4 a 8 dígitos. Serás el propietario.
+- Explorar con datos de demostración: crea un taller ficticio, separado de tus datos reales, con ~40 días de órdenes, compras, pagos y gastos. Todos los usuarios de la demostración usan el PIN 1234.
+- Restaurar taller desde una copia: para pasar tu taller a otro teléfono o computadora (necesitas el archivo de respaldo).
+
+**Después de crear tu taller**
+
+- Abre «Guía de inicio» (menú del perfil): te lleva paso a paso por datos del taller, impuestos, mecánicos, servicios, refacciones, primer cliente y primera orden.
+- En Ajustes revisa el IVA con tu contador, el margen objetivo y las horas productivas por mecánico.
+- Captura el costo laboral de cada mecánico (Personal): sin él, el costo de mano de obra de las órdenes aparece como estimado.
+
+## 2. Usuarios y roles
+
+Cada persona entra con su usuario y PIN (Ajustes → Usuarios, solo el propietario). El rol decide qué ve y qué puede hacer; el propietario puede además conceder o quitar permisos sueltos.
+
+- Propietario / administrador: todo, incluidos usuarios, configuración, salarios y respaldos.
+- Gerente: operación completa, inventario, finanzas y reportes; sin administrar usuarios ni salarios.
+- Recepcionista: clientes, vehículos, citas, órdenes, cotizaciones, entregas y cobros; no ve costos ni finanzas.
+- Mecánico: solo sus órdenes asignadas; registra tiempos, diagnóstico y refacciones usadas. No ve precios de compra, finanzas ni salarios.
+- Almacén: inventario, compras, recepciones y entrega de refacciones; ve costos.
+- Administración / finanzas: ventas, cobros, gastos, proveedores, cuentas por cobrar y pagar, caja y reportes.
+
+**Usuarios de la demostración**
+
+Propietario Demo, Gerente Demo, Recepción Demo, Almacén Demo, Finanzas Demo y un mecánico. Todos con PIN 1234. Entra con distintos roles para ver cómo cambia la app.
+
+**Seguridad**
+
+Las sesiones caducan a las 12 horas. Puedes cambiar tu PIN en Ajustes. Importante: como la app vive en el dispositivo, los roles evitan errores y accesos casuales, pero no sustituyen la protección del propio dispositivo.
+
+## 3. Una orden de trabajo, de principio a fin
+
+- Recepción: «+» → Nueva orden de trabajo. Elige cliente y vehículo (puedes crearlos ahí), kilometraje, combustible, motivo, daños y accesorios. Puedes adjuntar fotos y imprimir la hoja de recepción.
+- Diagnóstico: en la orden captura síntomas, inspección y diagnóstico. Agrega las partidas: mano de obra del catálogo, refacciones del inventario, consumibles, servicios externos u otros cargos.
+- Autorización: pasa la orden a «Pendiente de autorización» y registra quién autorizó, cuándo y por qué importe. Lo sugerido y lo cotizado no se cobra hasta que se autoriza. Los trabajos adicionales se agregan y se autorizan aparte.
+- Reparación: asigna mecánico y pasa a «En reparación». El mecánico inicia y detiene su cronómetro (solo puede tener uno abierto; iniciar otro pausa el anterior). Las refacciones se consumen del inventario con «Consumir»; el costo real queda guardado en la partida.
+- Pruebas y entrega: marca los trabajos ejecutados, pasa a «Lista para entrega» y usa «Entregar vehículo». La app emite la venta, congela costos y precios, y puedes cobrar o imprimir el resumen de entrega.
+- Cobro: «Registrar cobro» acepta pagos parciales y anticipos. El saldo pendiente queda en «Por cobrar».
+- Después: en la orden ves ingresos, costos, utilidad y margen reales; si algo está estimado o falta información, lo dice.
+
+**Casos especiales**
+
+- Cancelar: pide motivo, regresa al inventario lo consumido (con su costo original) y conserva el historial.
+- Garantía: desde una orden entregada, «Abrir garantía» crea una orden sin cobro cuyo costo sí se registra.
+- Una orden no avanza a estados incompatibles: por ejemplo, no pasa a «Lista para entrega» con trabajos autorizados sin ejecutar. La app te explica el motivo.
+
+## 4. Cotizaciones y citas
+
+- Cotizaciones: crea una con partidas del catálogo; al editar una ya enviada se crea una nueva versión y se conserva la anterior. Estados: borrador, enviada, vista, aprobada, rechazada, vencida, convertida.
+- Aprobada → «Convertir en orden»: la orden nace con las partidas autorizadas y la versión aceptada, sin recapturar.
+- El costo estimado y el margen previsto son solo para uso interno (los ves si tienes permiso); no aparecen en el PDF del cliente.
+- Agenda: citas por día, semana o mes. No permite dos citas del mismo mecánico a la misma hora. Una cita se convierte en orden conservando sus datos.
+
+## 5. Inventario, compras y proveedores
+
+- Productos: SKU, categoría, precio, stock mínimo, proveedor. La app calcula el costo promedio ponderado de cada refacción y su margen.
+- Compras: crea la orden de compra, envíala y registra la recepción (total o parcial). El flete se reparte entre lo recibido y el inventario sube al costo real. No se puede recibir de más ni repetir una recepción.
+- Pagos a proveedores: se registran aparte; una compra recibida sin pago sigue por pagar. Puedes pagar parcialmente.
+- Ajustes y mermas: siempre con motivo; el historial no se borra, los errores se corrigen con un movimiento contrario. «Inventario físico» compara lo contado con el sistema.
+- Alertas: stock bajo, agotados, sin movimiento, precio por debajo del costo, margen bajo y costo que subió sin actualizar el precio. La «Propuesta de compra» sugiere cuánto pedir; tú la revisas antes de convertirla en orden.
+
+## 6. Ventas, caja, gastos y cobranza
+
+- Ventas: las de mostrador se registran desde «+» → Registrar una venta; las de orden se generan al entregar. Venta no es lo mismo que cobro: puedes vender a crédito.
+- Devoluciones y cancelaciones: piden motivo; la refacción regresa al inventario al costo original y, si hubo cobros, se registra el reembolso.
+- Caja: abre una sesión con tu saldo inicial; los cobros y pagos en efectivo exigen caja abierta. Al cerrar, cuentas el efectivo; si hay diferencia debes explicarla. Aportaciones, retiros y préstamos del propietario no cuentan como ventas ni gastos.
+- Gastos: clasifícalos por categoría; puedes pagarlos al momento o después, y programar gastos recurrentes. La nómina de mecánicos no se resta dos veces (ya está en el costo de las órdenes).
+- Por cobrar y por pagar: saldos por antigüedad (no vencido, 1–30, 31–60, 61–90, más de 90 días) con acciones para cobrar o pagar.
+
+## 7. Cómo leer la rentabilidad
+
+- Margen = utilidad ÷ venta neta. Markup = utilidad ÷ costo. Son distintos; la app siempre dice cuál usa. Si no se puede calcular muestra «n/c».
+- Utilidad bruta = ventas netas − costos directos (refacciones, mano de obra imputada, externos). Utilidad operativa = utilidad bruta − gastos operativos.
+- Costos y rentabilidad: resumen del periodo, por orden, por refacción, por servicio, mano de obra, indirectos, calculadora de precios, propuestas de precio y punto de equilibrio.
+- Una propuesta de precio nunca cambia nada sola: alguien con permiso la aprueba y queda en el historial.
+- Estimado vs. observado: si un servicio no tuvo cronómetro, su costo de mano de obra usa el tiempo estándar y se marca como estimado.
+
+## 8. Reportes y documentos PDF
+
+- Reportes: 24 reportes con periodo, filtros, definición y fuente. Exporta a CSV (Excel) o imprime.
+- Documentos: cotización, orden de trabajo, hoja de recepción, autorización de trabajos, comprobante de pago y de venta, resumen de entrega, garantía y orden de compra. Cada uno tiene el botón «Imprimir».
+- Para obtener el PDF: toca «Imprimir / Guardar PDF» y en el diálogo elige «Guardar como PDF» (en iPhone: Compartir → Guardar en Archivos). En la app instalada de iPhone la impresión puede ser limitada; si falla, ábrela en Safari.
+- Los documentos para el cliente nunca incluyen costos, márgenes, notas internas ni salarios. Llevan el logotipo de tu taller (Ajustes).
+- No son comprobantes fiscales (CFDI).
+
+## 9. Respaldo y cambio de dispositivo
+
+- Ajustes → Copia de seguridad: descarga el archivo JSON con todo tu taller. Hazlo seguido (la app te lo recuerda cada 7 días). El archivo incluye los PIN protegidos: guárdalo en un lugar seguro.
+- Restaurar en el mismo taller: combinar (agrega lo que falte) o reemplazar (sustituye todo, con confirmación).
+- Nuevo dispositivo: en la pantalla de bienvenida usa «Restaurar taller desde una copia». Entras con los mismos usuarios y PIN.
+- Exportar a CSV: Ajustes o Reportes; respeta tus permisos (sin permiso de costos no salen costos).
+
+## 10. Instalar como app y uso sin conexión
+
+- iPhone: abre el sitio en Safari → Compartir → «Añadir a pantalla de inicio».
+- Android: Chrome → menú → «Instalar app». Computadora: icono de instalar en la barra de Chrome o Edge.
+- La app funciona sin internet y se actualiza sola al volver a abrirla; la versión está al final de Ajustes («Buscar actualización»).
+- Los datos viven solo en ese dispositivo: dos dispositivos no se sincronizan (usa el respaldo para moverlos).
+- En iPhone, instalada en la pantalla de inicio, iOS no borra los datos por inactividad; en una pestaña normal de Safari sí puede hacerlo. Instala la app y respalda.
+
+## 11. Preguntas frecuentes
+
+- ¿Por qué no me deja cobrar en efectivo? Abre la caja primero (Caja → Abrir caja).
+- ¿Por qué no puedo entregar la orden? Quedan trabajos autorizados sin ejecutar o refacciones sin consumir; la app lo indica.
+- ¿Qué significa «n/c»? No calculable: falta el costo o la venta es cero; la app no inventa porcentajes.
+- ¿Puedo editar un movimiento de inventario o un pago? No: se corrige con un movimiento contrario (ajuste, devolución o anulación) para conservar la trazabilidad.
+- ¿Emite facturas (CFDI)? No. Es una herramienta de gestión; la facturación fiscal requiere una integración aparte.
+- ¿Olvidé mi PIN? Otro propietario puede restablecerlo en Ajustes → Usuarios. Si eres el único, restaura una copia de seguridad.
+

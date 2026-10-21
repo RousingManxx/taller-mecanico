@@ -24,13 +24,18 @@ function Doc({ data, title, folio, date, children }: { data: Data; title: string
     <div className="stack" style={{ padding: 16 }}>
       <div className="row no-print"><button className="btn" onClick={() => nav(-1)}><Icon n="back" size={18} />Volver</button><button className="btn primary" onClick={() => window.print()}><Icon n="print" size={18} />Imprimir / Guardar PDF</button></div>
       <article className="doc">
-        <div className="row between" style={{ alignItems: 'flex-start' }}>
-          <div className="row" style={{ alignItems: 'flex-start' }}>{logo && <img src={logo.dataUrl} alt="" style={{ height: 52, maxWidth: 120, objectFit: 'contain' }} />}
-            <div><b style={{ fontSize: 16 }}>{s.businessName}</b>{s.legalName && <div>{s.legalName}</div>}{s.taxId && <div>RFC {s.taxId}</div>}<div>{s.address}</div><div>{[s.phone, s.email].filter(Boolean).join(' · ')}</div></div></div>
-          <div className="right"><h1>{title}</h1>{folio && <div><b>{folio}</b></div>}{date && <div>{date}</div>}</div>
+        <div className="dhead">
+          <div className="row between" style={{ alignItems: 'flex-start' }}>
+            <div className="row" style={{ alignItems: 'flex-start' }}>
+              {logo ? <img src={logo.dataUrl} alt="" style={{ height: 52, maxWidth: 120, objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 4 }} /> : <span className="mark">{(s.businessName || 'T').trim().charAt(0).toUpperCase()}</span>}
+              <div className="biz"><b>{s.businessName}</b>{s.legalName && <div className="small">{s.legalName}</div>}<div className="small">{[s.taxId && `RFC ${s.taxId}`, s.address].filter(Boolean).join(' · ')}</div><div className="small">{[s.phone, s.email].filter(Boolean).join(' · ')}</div></div></div>
+            <div className="right"><h1>{title}</h1>{folio && <span className="folio">{folio}</span>}{date && <div className="small">{date}</div>}</div>
+          </div>
         </div>
+        <div className="dbody">
         {children}
-        <p style={{ marginTop: 24, fontSize: 10, color: '#666' }}>Documento generado por Torque. Este documento es de control interno y no constituye un comprobante fiscal (CFDI).</p>
+        </div>
+        <div className="foot"><span>{s.businessName} · documento de control interno, no es un comprobante fiscal (CFDI).</span><span>Generado con Torque · {fmtDate(data.today)}</span></div>
       </article>
     </div>
   )

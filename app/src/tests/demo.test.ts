@@ -62,3 +62,17 @@ describe('Taller de demostración', () => {
     expect(await openOrgDb(real.ctx.orgId).customers.count()).toBe(1)
   }, 180000)
 })
+
+describe('La demostración no depende del día ni de la hora', () => {
+  it('se genera sin errores cualquier día de la semana, de madrugada y de tarde (UTC)', async () => {
+    const { vi } = await import('vitest')
+    for (const iso of ['2026-10-19T01:40:00Z', '2026-10-20T01:40:00Z', '2026-10-21T14:00:00Z', '2026-10-22T23:50:00Z', '2026-10-23T03:00:00Z', '2026-10-24T18:00:00Z', '2026-10-25T10:00:00Z']) {
+      vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date(iso))
+      try {
+        const ctx = await createDemoOrganization(14)
+        expect(await ctx.db.workOrders.count(), iso).toBeGreaterThan(3)
+      } finally { vi.useRealTimers() }
+    }
+    await deleteDemoOrganizations()
+  }, 240000)
+})

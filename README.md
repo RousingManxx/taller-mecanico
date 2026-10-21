@@ -10,10 +10,12 @@ PWA **local-first** en español (MXN): órdenes de trabajo, cotizaciones, client
 cd app
 npm install
 npm run dev            # http://localhost:5173
-npm test               # 79 pruebas (Vitest)
+npm test               # 80 pruebas (Vitest)
 npx tsc -b             # tipos
 npm run build          # producción en app/dist
 ```
+Guía de uso completa: `app/docs/GUIA-DE-USO.md` (también dentro de la app: menú del perfil → Guía de uso).
+
 Al abrir, elige **Crear mi taller** o **Explorar con datos de demostración** (taller ficticio y separado, PIN de todos los usuarios: `1234`).
 
 ## Instalar como app
@@ -31,7 +33,7 @@ Tres capas (detalle en `app/docs/ARQUITECTURA-UI.md`): **dominio puro** (`src/do
 - Impuestos configurables (IVA 16 %, 0 %, exento son valores iniciales editables; verifícalos con tu contador). **Es una vista gerencial, no contabilidad ni facturación fiscal.**
 
 ## Verificación realizada (evidencia real)
-- `npm test`: **79 pruebas pasan** — cálculos de dominio (margen, markup, redondeo, IVA, costo promedio, fechas, antigüedad, equilibrio), flujos A–F de punta a punta sobre IndexedDB simulada (orden → cobro → entrega → rentabilidad; venta de mostrador; compra parcial con flete; gastos y nómina sin doble conteo; caja con diferencia; cotización versionada), idempotencia (reintentos de pago, venta, recepción, consumo), integridad (cancelaciones, devoluciones, historial inmutable, saldos), aislamiento entre talleres, permisos en servicios, bloqueo de PIN, respaldo/restauración, exportaciones y protección contra inyección de fórmulas CSV, un taller de demostración cuyos invariantes se verifican (valor de inventario = suma de movimientos, cajas cuadradas, sin sobrepagos, 24 reportes), y el esquema PostgreSQL probado con PGlite (RLS, claves foráneas entre organizaciones, inventario ≥ 0, cobros ≤ saldo, idempotencia, traslapes).
+- `npm test`: **80 pruebas pasan** — cálculos de dominio (margen, markup, redondeo, IVA, costo promedio, fechas, antigüedad, equilibrio), flujos A–F de punta a punta sobre IndexedDB simulada (orden → cobro → entrega → rentabilidad; venta de mostrador; compra parcial con flete; gastos y nómina sin doble conteo; caja con diferencia; cotización versionada), idempotencia (reintentos de pago, venta, recepción, consumo), integridad (cancelaciones, devoluciones, historial inmutable, saldos), aislamiento entre talleres, permisos en servicios, bloqueo de PIN, respaldo/restauración, exportaciones y protección contra inyección de fórmulas CSV, un taller de demostración cuyos invariantes se verifican (valor de inventario = suma de movimientos, cajas cuadradas, sin sobrepagos, 24 reportes), y el esquema PostgreSQL probado con PGlite (RLS, claves foráneas entre organizaciones, inventario ≥ 0, cobros ≤ saldo, idempotencia, traslapes).
 - Navegador real (Edge, escritorio y móvil): recorrido de todas las rutas con datos de demostración y en un taller vacío **sin errores de consola** (`e2e/shot.mjs`, `e2e/empty.mjs`); PWA con service worker y arranque offline (`e2e/pwa.mjs`); los agentes de interfaz recorrieron además crear/autorizar/consumir/entregar/cancelar órdenes y la garantía (capturas), **pero no conservé sus reportes de prueba**, así que esos recorridos no están respaldados por un script reutilizable.
 
 ## Funcionalidades
