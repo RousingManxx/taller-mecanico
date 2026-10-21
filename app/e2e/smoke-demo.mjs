@@ -1,5 +1,5 @@
 import { launch, startDemo } from './helpers.mjs'
-const base = process.argv[2] ?? 'http://localhost:5170'
+const base = process.argv[2] ?? 'http://localhost:4173'
 const { browser, page, errors } = await launch()
 const t0 = Date.now()
 await startDemo(page, base)

@@ -12,6 +12,7 @@ type Mode = 'home' | 'create' | 'login'
 
 function Inner({ onStart }: { onStart: (c: Ctx) => void }) {
   const ui = useUi()
+  const fileRef = useRef<HTMLInputElement>(null)
   const orgs = useLiveQuery(() => registry.orgs.toArray(), [])
   const [mode, setMode] = useState<Mode>('home')
   const [org, setOrg] = useState<OrgRecord | null>(null)
@@ -52,7 +53,6 @@ function Inner({ onStart }: { onStart: (c: Ctx) => void }) {
     setBusy(false); setProgress(null)
     if (c) onStart(c)
   }
-  const fileRef = useRef<HTMLInputElement>(null)
   const restore = async (f?: File) => {
     if (!f) return
     const r = await ui.run(async () => restoreAsNewOrganization(await f.text()), 'Taller restaurado: inicia sesión con tus usuarios y PIN de siempre')
