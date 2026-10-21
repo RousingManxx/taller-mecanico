@@ -31,7 +31,7 @@ export function DeliverSheet({ data, orderId, onClose }: { data: Data; orderId: 
     const money = data.can('ventas.ver')
     return (
       <Sheet title="Vehículo entregado" onClose={onClose} footer={<>
-        <a className="btn" href={printHref('entrega', orderId)} target="_blank" rel="noopener">Imprimir entrega</a>
+        <a className="btn" href={printHref('entrega', orderId)}>Imprimir entrega</a>
         {money && <button className="btn" onClick={() => { onClose(); nav(`/ventas/${result.id}`) }}>Ver venta</button>}
         {data.can('cobros.registrar') && bal > 0 && <button className="btn primary" onClick={() => open({ k: 'payment', saleId: result.id })}>Registrar cobro</button>}
         {!(data.can('cobros.registrar') && bal > 0) && <button className="btn primary" onClick={onClose}>Listo</button>}

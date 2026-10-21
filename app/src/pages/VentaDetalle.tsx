@@ -78,7 +78,7 @@ export function VentaDetalle({ data }: { data: Data }) {
         <div className="row wrap">
           {emitted && bal > 0 && data.can('cobros.registrar') && <button className="btn primary" onClick={() => open({ k: 'payment', saleId: sale.id })}>Cobrar</button>}
           {emitted && hasLeft && data.can('ventas.cancelar') && <button className="btn" onClick={() => open({ k: 'return', saleId: sale.id })}>Devolver</button>}
-          <a className="btn" href={`#/imprimir/venta/${sale.id}`} target="_blank" rel="noopener">Imprimir</a>
+          <a className="btn" href={`#/imprimir/venta/${sale.id}`}>Imprimir</a>
           {emitted && data.can('ventas.cancelar') && <button className="btn danger" disabled={busy} onClick={doCancel}>Cancelar venta</button>}
         </div>
       </div>
@@ -125,7 +125,7 @@ export function VentaDetalle({ data }: { data: Data }) {
                         <div className="small muted">{fmtDateTime(l.at)} · fecha {fmtDate(l.date)} · {userName(l.userId)}{l.reference ? ` · ref. ${l.reference}` : ''}{l.note ? ` · ${l.note}` : ''}</div>
                       </div>
                       <div className="mny-actions">
-                        <a className="btn small" href={`#/imprimir/comprobante/${l.id}`} target="_blank" rel="noopener">Comprobante</a>
+                        <a className="btn small" href={`#/imprimir/comprobante/${l.id}`}>Comprobante</a>
                         {l.kind === 'cobro_cliente' && !isVoided && data.can('ventas.cancelar') && <button className="btn small danger" disabled={busy} onClick={() => doVoid(l)}>Anular cobro</button>}
                       </div>
                     </div>

@@ -275,3 +275,12 @@ button, .btn, .tab, .iconbtn, .chip, .seg button, .item, .stat, .sidebar a, .men
 input, textarea, select, .doc, p, td { -webkit-user-select: text; user-select: text; }
 svg.rot { transform: rotate(90deg); }
 @media (display-mode: standalone) { .banner.info[aria-label="Instalar la app"] { display: none; } .tabbar { bottom: calc(var(--sab) + 6px); } }
+
+/* ───── Pantalla de documento (vista previa + PDF) ───── */
+.pdfpage { min-height: 100dvh; background: var(--bg); }
+.pdfbar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 10px; padding: calc(var(--sat) + 10px) max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.pdfscroll { padding: 16px max(12px, env(safe-area-inset-right)) calc(var(--sab) + 28px) max(12px, env(safe-area-inset-left)); overflow-x: auto; }
+.pdfscroll .doc { min-width: 0; }
+@media (max-width: 640px) { .doc .dhead { padding: 16px 16px 14px; } .doc .dbody { padding: 4px 16px 0; } .doc .foot { margin: 16px 16px 0; } .doc .dhead h1 { font-size: 16px; } .doc .sig { gap: 16px; } }
+.pdfbar .btn { white-space: nowrap; flex: none; padding: 8px 16px; }
+@media (max-width: 480px) { .hide-xs { display: none; } .pdfbar { gap: 8px; } .pdfbar .btn { padding: 8px 14px; } }

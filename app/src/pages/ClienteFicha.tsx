@@ -181,7 +181,7 @@ function PaymentsTab({ data, ledger, saleMap }: { data: Data; ledger: LedgerEntr
     { key: 'v', label: 'Aplicado a', render: (l) => { const s = l.saleId ? saleMap.get(l.saleId) : undefined; return s ? <Link to={`/ventas/${s.id}`} onClick={(e) => e.stopPropagation()}>{s.folio}</Link> : l.workOrderId ? <span>Anticipo de orden {data.orderMap.get(l.workOrderId)?.folio ?? ''}</span> : '—' } },
     { key: 'm', label: 'Método', hideMobile: true, render: (l) => data.settings.paymentMethods.find((m) => m.id === l.methodId)?.name ?? l.methodId },
     { key: 'a', label: 'Importe', align: 'r', render: (l) => <span className={l.direction === 'in' ? 'pos' : 'neg'}>{l.direction === 'in' ? '+' : '−'}{formatMXN(l.amountCents)}</span> },
-    { key: 'p', label: 'Comprobante', hideMobile: true, render: (l) => <a href={`#/imprimir/comprobante/${l.id}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>Ver</a> },
+    { key: 'p', label: 'Comprobante', hideMobile: true, render: (l) => <a href={`#/imprimir/comprobante/${l.id}`} onClick={(e) => e.stopPropagation()}>Ver</a> },
   ]
   return <DataTable rows={ledger} columns={cols} rowKey={(l) => l.id} empty={<Empty title="Sin pagos registrados" text="Los cobros y anticipos de este cliente aparecerán aquí." />} />
 }

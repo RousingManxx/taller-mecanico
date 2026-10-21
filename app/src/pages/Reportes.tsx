@@ -4,6 +4,9 @@ import { fmtCell, reportToCsv } from '../domain/csv'
 import { inRange } from '../domain/dates'
 import { REPORTS, reportById, type ReportData } from '../domain/reports'
 import { download, fmtDate, fmtDateTime, type Data } from '../ui/data'
+import { reportDoc } from '../ui/docs'
+import { downloadPdf, makePdf, pdfName } from '../ui/pdfActions'
+import { useSession } from '../ui/session'
 import { PeriodPicker, usePeriod } from '../ui/period'
 import { Badge, Empty, Icon, useUi } from '../ui/ui'
 
@@ -14,7 +17,7 @@ function toData(d: Data): ReportData {
 }
 
 function Viewer({ data, id }: { data: Data; id: string }) {
-  const nav = useNavigate(), ui = useUi()
+  const nav = useNavigate(), ui = useUi(), { ctx } = useSession()
   const def = reportById(id)
   const ps = usePeriod(data.today, id === 'cxc' || id === 'cxp' || id === 'valor_inventario' || id === 'margen_bajo' ? 'hoy' : 'mes')
   const [sep, setSep] = useState<',' | ';'>(',')
@@ -27,7 +30,7 @@ function Viewer({ data, id }: { data: Data; id: string }) {
   return (
     <div className="stack-lg">
       <div className="page-head no-print"><div><button className="btn small ghost" onClick={() => nav('/reportes')}><Icon n="back" size={16} />Reportes</button><h1>{def.title}</h1><div className="sub">{def.description}</div></div>
-        <div className="row wrap"><select aria-label="Separador CSV" value={sep} onChange={(e) => setSep(e.target.value as ',' | ';')} style={{ width: 'auto' }}><option value=",">CSV con coma</option><option value=";">CSV con punto y coma</option></select><button className="btn" onClick={exportCsv}><Icon n="down" size={18} />CSV</button><button className="btn" onClick={() => window.print()}><Icon n="print" size={18} />Imprimir / PDF</button></div></div>
+        <div className="row wrap"><select aria-label="Separador CSV" value={sep} onChange={(e) => setSep(e.target.value as ',' | ';')} style={{ width: 'auto' }}><option value=",">CSV con coma</option><option value=";">CSV con punto y coma</option></select><button className="btn" onClick={exportCsv}><Icon n="down" size={18} />CSV</button><button className="btn primary" onClick={async () => { const doc = reportDoc(data, res); downloadPdf(pdfName(doc), await makePdf(ctx, data, doc)); ui.toast('PDF generado') }}><Icon n="down" size={18} />PDF</button></div></div>
       {ranged && <div className="no-print"><PeriodPicker s={ps} /></div>}
       <div className="card stack-sm">
         <div className="row between wrap"><b>{res.title}</b>{res.sensitive && <Badge tone="warn">Contiene costos (uso interno)</Badge>}</div>

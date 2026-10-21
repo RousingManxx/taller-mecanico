@@ -21,7 +21,7 @@ export function PoButtons({ data: d, po, onDone }: { data: Data; po: PurchaseOrd
       {d.can('compras.recibir') && ['borrador', 'enviada', 'parcial'].includes(po.status) && <button className="btn small primary" onClick={go(() => open({ k: 'receive', poId: po.id }))}>Recibir</button>}
       {edit && canEdit && <button className="btn small" onClick={go(() => open({ k: 'purchase', v: po }))}>Editar</button>}
       {edit && ['borrador', 'enviada', 'parcial'].includes(po.status) && <button className="btn small danger" disabled={busy} onClick={() => cancel(po).then((r) => r && onDone?.())}>Cancelar</button>}
-      <a className="btn small" href={`#/imprimir/compra/${po.id}`} target="_blank" rel="noopener">Imprimir</a>
+      <a className="btn small" href={`#/imprimir/compra/${po.id}`}>Imprimir</a>
     </>
   )
 }

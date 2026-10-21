@@ -66,7 +66,7 @@ export function PaymentSheet({ data, saleId: saleIdProp, workOrderId, onClose }:
   })
 
   if (done) return (
-    <Sheet title="Cobro registrado" onClose={onClose} footer={<><a className="btn" href={`#/imprimir/comprobante/${done.id}`} target="_blank" rel="noopener">Imprimir comprobante</a><button className="btn primary" onClick={onClose}>Listo</button></>}>
+    <Sheet title="Cobro registrado" onClose={onClose} footer={<><a className="btn" href={`#/imprimir/comprobante/${done.id}`}>Imprimir comprobante</a><button className="btn primary" onClick={onClose}>Listo</button></>}>
       <div className="stack">
         <div className="banner ok"><b>{formatMXN(done.amountCents)}</b> recibidos por {data.settings.paymentMethods.find((m) => m.id === done.methodId)?.name ?? done.methodId}{done.reference ? ` (ref. ${done.reference})` : ''}.</div>
         {mode === 'venta' && sale && (() => {

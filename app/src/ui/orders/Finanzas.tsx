@@ -113,7 +113,7 @@ function PaymentsCard({ pays, method }: { pays: ReturnType<typeof paymentsOf>; m
       {pays.map((l) => (
         <div key={l.id} className="row between wrap" style={{ borderTop: '1px solid var(--line)', paddingTop: 8 }}>
           <div><div><b>{l.kind === 'cobro_cliente' ? (l.saleId ? 'Cobro' : 'Anticipo') : 'Reembolso'}</b> · {method(l.methodId)}{l.reference && ` · ${l.reference}`}</div><div className="small muted">{fmtDate(l.date)}{l.note && ` · ${l.note}`}</div></div>
-          <div className="row" style={{ gap: 10 }}><b className={`num ${l.direction === 'in' ? 'pos' : 'neg'}`}>{l.direction === 'in' ? '+' : '−'} {formatMXN(l.amountCents)}</b><a className="btn small" href={`#/imprimir/comprobante/${l.id}`} target="_blank" rel="noopener">Comprobante</a></div>
+          <div className="row" style={{ gap: 10 }}><b className={`num ${l.direction === 'in' ? 'pos' : 'neg'}`}>{l.direction === 'in' ? '+' : '−'} {formatMXN(l.amountCents)}</b><a className="btn small" href={`#/imprimir/comprobante/${l.id}`}>Comprobante</a></div>
         </div>
       ))}
     </section>

@@ -83,7 +83,7 @@ function Detalle({ data, q }: { data: Data; q: Quotation }) {
               {q.approvedVersion && <Badge tone="ok">Aprobada: v{q.approvedVersion}</Badge>}
             </div>
           </div>
-          <div className="row wrap"><a className="btn" href={`#/imprimir/cotizacion/${q.id}`} target="_blank" rel="noopener noreferrer">Imprimir</a></div>
+          <div className="row wrap"><a className="btn" href={`#/imprimir/cotizacion/${q.id}`}>Imprimir</a></div>
         </div>
         <div className="small">Cliente: {cust ? <Link to={`/clientes/${cust.id}`}>{cust.name}</Link> : '—'} · Vehículo: {veh ? <Link to={`/vehiculos/${veh.id}`}>{plateOf(veh)}</Link> : '—'} · Emitida {fmtDate(q.issueDate)} · Vigente hasta {fmtDate(q.validUntil)}</div>
       </div>

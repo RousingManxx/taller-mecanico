@@ -111,11 +111,11 @@ function Header({ data, order }: { data: Data; order: WorkOrder }) {
           </div>
           <div className="row wrap" style={{ gap: 6 }}>
             <span className="small muted">Imprimir:</span>
-            <a className="btn small" href={printHref('orden', order.id)} target="_blank" rel="noopener">Orden</a>
-            <a className="btn small" href={printHref('recepcion', order.id)} target="_blank" rel="noopener">Hoja de recepción</a>
-            {lastAuth && <a className="btn small" href={printHref('autorizacion', order.id, lastAuth.id)} target="_blank" rel="noopener">Autorización</a>}
-            {order.status === 'entregada' && <a className="btn small" href={printHref('entrega', order.id)} target="_blank" rel="noopener">Entrega</a>}
-            {(order.isWarranty || order.status === 'entregada') && <a className="btn small" href={printHref('garantia', order.id)} target="_blank" rel="noopener">Garantía</a>}
+            <a className="btn small" href={printHref('orden', order.id)}>Orden</a>
+            <a className="btn small" href={printHref('recepcion', order.id)}>Hoja de recepción</a>
+            {lastAuth && <a className="btn small" href={printHref('autorizacion', order.id, lastAuth.id)}>Autorización</a>}
+            {order.status === 'entregada' && <a className="btn small" href={printHref('entrega', order.id)}>Entrega</a>}
+            {(order.isWarranty || order.status === 'entregada') && <a className="btn small" href={printHref('garantia', order.id)}>Garantía</a>}
           </div>
         </div>
 

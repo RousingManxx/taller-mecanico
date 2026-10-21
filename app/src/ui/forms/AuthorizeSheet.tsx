@@ -23,7 +23,7 @@ export function AuthorizeSheet({ data, orderId, itemIds, onClose }: { data: Data
   if (!order) return <Sheet title="Autorizar trabajos" onClose={onClose}><Empty title="La orden no existe" /></Sheet>
   if (done) {
     return (
-      <Sheet title="Autorización registrada" onClose={onClose} footer={<><a className="btn" href={printHref('autorizacion', orderId, done.id)} target="_blank" rel="noopener">Imprimir autorización</a><button className="btn primary" onClick={onClose}>Listo</button></>}>
+      <Sheet title="Autorización registrada" onClose={onClose} footer={<><a className="btn" href={printHref('autorizacion', orderId, done.id)}>Imprimir autorización</a><button className="btn primary" onClick={onClose}>Listo</button></>}>
         <div className="stack">
           <div className="banner ok" role="status">Se autorizaron {done.itemIds.length} partida(s) por {formatMXN(done.amountCents)} (con IVA), aprobadas por {done.approvedBy}.</div>
           <p className="small muted">Quedó registrado quién autorizó, cuándo, por qué importe y por qué vía. Si la orden estaba en recepción, diagnóstico o pendiente de autorización, pasó a «Autorizada».</p>
