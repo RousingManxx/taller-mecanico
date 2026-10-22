@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { formatMXN, parseNum } from '../domain/money'
 import { UserError } from '../services/core'
 
@@ -35,7 +36,8 @@ export function Sheet({ title, onClose, children, footer, wide }: { title: strin
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null
-    ref.current?.querySelector<HTMLElement>('input:not([type=hidden]), select, textarea, button.primary')?.focus()
+    // preventScroll: el panel ya está sobre la pantalla; enfocar no debe desplazar la página que queda detrás.
+    ref.current?.querySelector<HTMLElement>('input:not([type=hidden]), select, textarea, button.primary')?.focus({ preventScroll: true })
     const k = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { e.stopPropagation(); onClose() }
       if (e.key === 'Tab' && ref.current) { // trampa de foco dentro del diálogo
@@ -48,7 +50,9 @@ export function Sheet({ title, onClose, children, footer, wide }: { title: strin
     addEventListener('keydown', k, true)
     return () => { removeEventListener('keydown', k, true); prev?.focus?.() }
   }, [onClose])
-  return (
+  // En `body` y no dentro de la página: así ningún contenedor con transform, filter o animación puede convertirse en el «marco» del
+  // `position: fixed` y desplazar el panel al fondo del contenido (era el caso de `.page`, ver index.css).
+  return createPortal(
     <div className="sheet-wrap">
       <div className="scrim" onClick={onClose} />
       <div className={`sheet ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} ref={ref}>
@@ -56,7 +60,8 @@ export function Sheet({ title, onClose, children, footer, wide }: { title: strin
         <div className="sheet-body">{children}</div>
         {footer && <div className="sheet-foot">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

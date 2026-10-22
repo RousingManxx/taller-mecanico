@@ -247,7 +247,11 @@ textarea { min-height: 80px; resize: vertical; }
 
 /* ───── Animaciones suaves ───── */
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-.page { animation: rise 0.34s cubic-bezier(.2, .8, .2, 1) both; }
+/* `backwards` y no `both`: con `forwards` la página conservaba la transformación de la animación al terminar y se volvía el «marco» de todo
+   `position: fixed` que lleve dentro (los paneles de ProductSheet, Gastos, Agenda…), que aparecían al fondo del contenido en vez de sobre la pantalla. */
+/* `position: relative` mantiene a `.page` como marco de lo `position: absolute` (p. ej. los `.sr-only` de la barra de pasos de una orden), que antes
+   lo era por accidente gracias a la transformación; a diferencia de `transform`, no es marco de lo `position: fixed`. */
+.page { position: relative; animation: rise 0.34s cubic-bezier(.2, .8, .2, 1) backwards; }
 .item, .btn, .stat, .tab, .seg button, .chip { transition: transform 0.18s cubic-bezier(.2, .8, .2, 1), box-shadow 0.2s, background-color 0.2s, border-color 0.2s, color 0.2s; }
 @media (hover: hover) { .item:hover { transform: translateY(-1px); } }
 .item:active, .btn:active:not(:disabled), .tab:active { transform: scale(0.97); }
