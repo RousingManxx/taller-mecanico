@@ -8,6 +8,15 @@ Todos los cambios relevantes de Torque se anotan aquí. Formato basado en [Keep 
 
 ## [Sin publicar]
 
+## [1.3.2] — 2026-10-22
+
+### Corregido
+- **Paneles que aparecían al fondo de la página (sobre todo en teléfono).** Al tocar un registro de Inventario (productos y servicios), y también en Agenda, Gastos, Cotizaciones, Vehículos y la revisión de copias en Ajustes, la pantalla se oscurecía pero el panel quedaba al final del contenido y había que bajar para verlo; además la página saltaba al abrirlo. Causa: la animación de entrada de cada página conservaba una transformación al terminar, y eso hacía que el panel (`position: fixed`) se midiera contra la página y no contra la pantalla. Ahora los paneles se dibujan directamente en `body`, la animación ya no deja transformación (`fill-mode: backwards`) y enfocar el panel no desplaza la página.
+- La barra de pasos del detalle de una orden conserva su contención (`.page` pasa a ser explícitamente el marco de lo `position: absolute`); sin eso, quitar la transformación habría provocado desbordamiento horizontal.
+
+### Agregado
+- Recorrido E2E `app/e2e/sheet.mjs` (17 comprobaciones, teléfono y escritorio): el panel cubre exactamente la pantalla, se ve completo, no desplaza la página y cuelga de `body`.
+
 ## [1.3.1] — 2026-10-22
 
 ### Agregado
