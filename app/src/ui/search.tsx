@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Data } from './data'
-import { Icon } from './ui'
+import { Icon, Popover } from './ui'
 
-interface Hit { id: string; group: string; title: string; sub: string; to: string }
+export interface Hit { id: string; group: string; title: string; sub: string; to: string }
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
 /** Búsqueda global: clientes, vehículos, órdenes, cotizaciones, ventas, productos y proveedores. Respeta los permisos. */
@@ -25,20 +25,60 @@ export function useSearch(d: Data, q: string): Hit[] {
   }, [d, q])
 }
 
+/** Resultados agrupados; los comparten el panel móvil y el desplegable del escritorio. */
+function SearchResults({ hits, q, onPick }: { hits: Hit[]; q: string; onPick: (to: string) => void }) {
+  const groups = [...new Set(hits.map((h) => h.group))]
+  return (
+    <>
+      {q.trim().length >= 2 && !hits.length && <div className="muted small">Sin resultados para «{q}».</div>}
+      {groups.map((g) => (
+        <div key={g} className="stack-sm"><div className="small muted" style={{ fontWeight: 700 }}>{g}</div>
+          {hits.filter((h) => h.group === g).map((h) => <button key={h.id} className="item" onClick={() => onPick(h.to)}><div className="grow"><div className="ttl">{h.title}</div><div className="sub">{h.sub}</div></div><Icon n="chevron" size={16} /></button>)}
+        </div>
+      ))}
+    </>
+  )
+}
+
+/** Móvil: la búsqueda vive en un panel (Sheet) con su propio campo. */
 export function SearchPanel({ data, onPick, autoFocus }: { data: Data; onPick: () => void; autoFocus?: boolean }) {
   const [q, setQ] = useState('')
   const hits = useSearch(data, q)
   const nav = useNavigate()
-  const groups = [...new Set(hits.map((h) => h.group))]
   return (
     <div className="stack">
       <div className="search"><Icon n="search" size={18} /><input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar cliente, placas, folio, SKU…" aria-label="Búsqueda global" autoFocus={autoFocus} /></div>
-      {q.trim().length >= 2 && !hits.length && <div className="muted small">Sin resultados para «{q}».</div>}
-      {groups.map((g) => (
-        <div key={g} className="stack-sm"><div className="small muted" style={{ fontWeight: 700 }}>{g}</div>
-          {hits.filter((h) => h.group === g).map((h) => <button key={h.id} className="item" onClick={() => { nav(h.to); onPick() }}><div className="grow"><div className="ttl">{h.title}</div><div className="sub">{h.sub}</div></div><Icon n="chevron" size={16} /></button>)}
-        </div>
-      ))}
+      <SearchResults hits={hits} q={q} onPick={(to) => { nav(to); onPick() }} />
+    </div>
+  )
+}
+
+/**
+ * Escritorio: el campo de la barra es el buscador (se escribe ahí mismo) y los resultados salen en un desplegable justo debajo,
+ * del ancho del campo. Enter abre el primer resultado y Escape cierra y limpia.
+ */
+export function DeskSearch({ data }: { data: Data }) {
+  const [q, setQ] = useState('')
+  const [open, setOpen] = useState(false)
+  const box = useRef<HTMLDivElement>(null)
+  const input = useRef<HTMLInputElement>(null)
+  const hits = useSearch(data, q)
+  const nav = useNavigate()
+  const done = () => { setOpen(false); setQ(''); input.current?.blur() }
+  const go = (to: string) => { nav(to); done() }
+  const showing = open && q.trim().length > 0
+  return (
+    <div className="search" ref={box}>
+      <Icon n="search" size={18} />
+      <input ref={input} type="search" value={q} placeholder="Buscar cliente, placas, folio, SKU…" aria-label="Búsqueda global" autoComplete="off"
+        role="combobox" aria-expanded={showing} aria-controls="desk-search-results" aria-autocomplete="list"
+        onChange={(e) => { setQ(e.target.value); setOpen(true) }} onFocus={() => setOpen(true)}
+        onKeyDown={(e) => { if (e.key === 'Enter' && hits[0]) go(hits[0].to); else if (e.key === 'Escape') done() }} />
+      {showing && (
+        <Popover anchor={box} align="start" matchWidth className="searchpop" onClose={() => setOpen(false)}>
+          <div id="desk-search-results" className="stack"><SearchResults hits={hits} q={q} onPick={go} /></div>
+        </Popover>
+      )}
     </div>
   )
 }

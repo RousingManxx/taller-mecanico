@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { formatMXN, parseNum } from '../domain/money'
 import { UserError } from '../services/core'
@@ -63,6 +63,35 @@ export function Sheet({ title, onClose, children, footer, wide }: { title: strin
     </div>,
     document.body,
   )
+}
+
+/* ───────── Capas ancladas (escritorio) ───────── */
+/**
+ * Capa junto a un botón o campo: se coloca justo debajo del disparador, alineada a su borde izquierdo (`start`) o derecho (`end`), y se
+ * cierra con un clic fuera o Escape. Como `Sheet`, se dibuja en `body` para que ningún contenedor se vuelva el «marco» de su posición fija.
+ * Con `role="menu"` enfoca el primer elemento al abrirse.
+ */
+export function Popover({ anchor, align = 'start', matchWidth, onClose, className = '', role, children }: { anchor: RefObject<HTMLElement | null>; align?: 'start' | 'end'; matchWidth?: boolean; onClose: () => void; className?: string; role?: string; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<CSSProperties | null>(null)
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = anchor.current
+      if (!el) return
+      const r = el.getBoundingClientRect(), vw = document.documentElement.clientWidth // sin la barra de desplazamiento
+      setPos({ top: Math.round(r.bottom + 8), ...(align === 'end' ? { right: Math.max(8, Math.round(vw - r.right)) } : { left: Math.max(8, Math.round(r.left)) }), ...(matchWidth ? { width: Math.round(r.width) } : {}) })
+    }
+    place(); addEventListener('resize', place)
+    return () => removeEventListener('resize', place)
+  }, [anchor, align, matchWidth])
+  useEffect(() => {
+    const down = (e: MouseEvent) => { const t = e.target as Node; if (!ref.current?.contains(t) && !anchor.current?.contains(t)) onClose() }
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('mousedown', down); addEventListener('keydown', key)
+    return () => { document.removeEventListener('mousedown', down); removeEventListener('keydown', key) }
+  }, [anchor, onClose])
+  useEffect(() => { if (role === 'menu') ref.current?.querySelector<HTMLElement>('[role=menuitem]')?.focus() }, [role])
+  return createPortal(<div ref={ref} className={`pop glass ${align === 'end' ? 'pop-end' : ''} ${className}`} style={pos ?? { visibility: 'hidden' }} role={role}>{children}</div>, document.body)
 }
 
 /* ───────── Formularios ───────── */
