@@ -8,6 +8,16 @@ Todos los cambios relevantes de Torque se anotan aquí. Formato basado en [Keep 
 
 ## [Sin publicar]
 
+## [1.3.1] — 2026-10-22
+
+### Agregado
+- **Client ID revocado, eliminado o mal configurado:** si Google rechaza la aplicación, el respaldo en Drive se inhabilita con un aviso claro (global y en Ajustes), la app deja de insistir con ventanas de error, los datos locales y las copias manuales siguen funcionando y «Reintentar» vuelve a conectar cuando se corrija. Antes aparecía «Reconectar» una y otra vez sin explicar el motivo. Ver `app/docs/DRIVE.md`.
+- Los fallos de Drive llevan un código (`reconnect`, `session`, `offline`, `http`, `blocked`) para que la interfaz sepa qué ofrecer; el aviso de límite de uso (403) orienta sobre una aplicación deshabilitada.
+- Recorrido E2E (`app/e2e/drive.mjs`, 24 comprobaciones) con Google y Drive simulados: dos dispositivos, conflicto, aviso de versión más nueva, desconectar, Client ID revocado y renovación con clic. 5 pruebas unitarias nuevas (99 en total).
+
+### Cambiado
+- Sin conectar, el botón pasa a «Reintentar» (vuelve a conectar) cuando la aplicación estaba bloqueada.
+
 ## [1.3.0] — 2026-10-22
 
 ### Agregado
