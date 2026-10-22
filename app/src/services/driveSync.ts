@@ -1,5 +1,5 @@
 import { createBackup, parseBackup, restoreBackup, type BackupFile } from './backup'
-import { fail, need, stamp, uid, type Ctx } from './core'
+import { UserError, need, stamp, uid, type Ctx } from './core'
 
 /**
  * Respaldo en Google Drive: un solo archivo con nombre fijo por taller. No hay fusión automática:
@@ -10,12 +10,27 @@ const API = 'https://www.googleapis.com/drive/v3/files'
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files'
 const FIELDS = 'id,version,modifiedTime,trashed,appProperties'
 
+/** Error redactado para el usuario. `code` permite a la interfaz decidir qué ofrecer (renovar, inhabilitar, reintentar…). */
+export type DriveErrorCode = 'reconnect' | 'blocked' | 'offline' | 'session' | 'http'
+export class DriveError extends UserError {
+  code: DriveErrorCode
+  /** Dato técnico (p. ej. el error que devolvió Google), para registrarlo en el estado y no para mostrarlo tal cual. */
+  detail?: string
+  constructor(code: DriveErrorCode, message: string, detail?: string) { super(message); this.name = 'DriveError'; this.code = code; this.detail = detail }
+}
+export const RECONNECT = 'Reconecta Google Drive para seguir respaldando.'
+export const BLOCKED = 'Google rechazó la conexión de la aplicación (puede haberse revocado o estar mal configurada). Tus datos en este dispositivo no se ven afectados.'
+
+/** Errores de Google que indican que la aplicación (Client ID) no es utilizable: reintentar no sirve hasta que se corrija. */
+const BLOCKING = new Set(['invalid_client', 'unauthorized_client', 'deleted_client', 'disabled_client', 'invalid_request', 'invalid_scope', 'redirect_uri_mismatch', 'origin_mismatch'])
+export const isBlockingGoogleError = (e?: string): boolean => !!e && BLOCKING.has(e)
+
 /** Acceso a la red y al token, inyectables (pruebas y manejo de expiración en la interfaz). */
 export interface DriveEnv { fetch: typeof fetch; token: () => Promise<string> }
 
 export interface RemoteInfo { id: string; version: string; modifiedTime: string; backupCreatedAt: string; deviceId: string }
-/** Estado propio de cada dispositivo (no viaja en la copia). `dirty`: hay cambios locales sin subir. */
-export interface DriveState { deviceId: string; enabled: boolean; dirty: boolean; fileId?: string; version?: string; backupCreatedAt?: string; lastSyncAt?: string }
+/** Estado propio de cada dispositivo (no viaja en la copia). `dirty`: hay cambios locales sin subir. `blocked`: motivo por el que se dejó de intentar. */
+export interface DriveState { deviceId: string; enabled: boolean; dirty: boolean; fileId?: string; version?: string; backupCreatedAt?: string; lastSyncAt?: string; blocked?: string }
 export type RemoteStatus =
   | { status: 'none' }
   | { status: 'in-sync'; remote: RemoteInfo }
@@ -48,9 +63,12 @@ function saveState(orgId: string, s: DriveState): void {
 const patchState = (orgId: string, p: Partial<DriveState>): DriveState => { const s = { ...getDriveState(orgId), ...p }; saveState(orgId, s); return s }
 
 export function setDriveEnabled(orgId: string, enabled: boolean): void {
-  if (enabled) patchState(orgId, { enabled })
-  else patchState(orgId, { enabled, fileId: undefined, version: undefined, backupCreatedAt: undefined, dirty: true })
+  if (enabled) patchState(orgId, { enabled, blocked: undefined })
+  else patchState(orgId, { enabled, fileId: undefined, version: undefined, backupCreatedAt: undefined, blocked: undefined, dirty: true })
 }
+/** Deja de intentar sincronizar (p. ej. Client ID revocado) hasta que el usuario reintente. Los datos locales no se tocan. */
+export const blockDrive = (orgId: string, reason: string): void => { patchState(orgId, { blocked: reason }) }
+export const unblockDrive = (orgId: string): void => { patchState(orgId, { blocked: undefined }) }
 
 /** Marca cambios locales sin subir y avisa a quien escuche (para la subida automática). */
 export function markDirty(orgId: string): void {
@@ -76,11 +94,13 @@ async function call(env: DriveEnv, url: string, init: RequestInit = {}): Promise
   const token = await env.token() // si falla, su mensaje (p. ej. «vuelve a conectar») llega tal cual al usuario
   let r: Response
   try { r = await env.fetch(url, { ...init, headers: { ...(init.headers as Record<string, string> | undefined), Authorization: `Bearer ${token}` } }) }
-  catch { return fail('No hay conexión con Google Drive.') }
-  if (r.status === 401) return fail('Google Drive cerró la sesión: vuelve a conectar.')
+  catch { throw new DriveError('offline', 'No hay conexión con Google Drive.') }
+  if (r.status === 401) throw new DriveError('session', 'Google Drive cerró la sesión: vuelve a conectar.')
   return r
 }
-const check = (r: Response, what: string) => { if (!r.ok) fail(`Google Drive no pudo ${what} (${r.status}).`) }
+const check = (r: Response, what: string) => {
+  if (!r.ok) throw new DriveError('http', `Google Drive no pudo ${what} (${r.status}).${r.status === 403 ? ' Puede ser un límite de uso o que la aplicación esté deshabilitada en Google.' : ''}`)
+}
 const info = (f: DriveFile): RemoteInfo => ({ id: f.id, version: String(f.version ?? ''), modifiedTime: f.modifiedTime ?? '', backupCreatedAt: f.appProperties?.backupCreatedAt ?? '', deviceId: f.appProperties?.deviceId ?? '' })
 
 /** Localiza el archivo del taller: primero por el id guardado y, si no, buscándolo por sus propiedades. */
@@ -152,11 +172,11 @@ export async function syncNow(ctx: Ctx, env: DriveEnv): Promise<SyncOutcome> {
 /** Trae la copia de Drive y la aplica con las reglas de la restauración (`combinar` conserva lo local). */
 export async function pullRemote(ctx: Ctx, env: DriveEnv, mode: 'combinar' | 'reemplazar'): Promise<{ added: number; skipped: number }> {
   need(ctx, 'respaldo.restaurar')
-  const remote = (await findRemote(ctx, env)) ?? fail('No hay ninguna copia en Google Drive.')
+  const remote = (await findRemote(ctx, env)) ?? (() => { throw new DriveError('http', 'No hay ninguna copia en Google Drive.') })()
   const r = await call(env, `${API}/${remote.id}?alt=media`)
   check(r, 'descargar la copia')
   const rep = parseBackup(await r.text(), ctx.orgId)
-  if (!rep.ok || !rep.data) return fail(rep.errors[0] ?? 'La copia de Drive no es válida.')
+  if (!rep.ok || !rep.data) throw new DriveError('http', rep.errors[0] ?? 'La copia de Drive no es válida.')
   const hadLocal = getDriveState(ctx.orgId).dirty
   const out = await restoreBackup(ctx, rep.data, mode)
   // Combinar deja datos que Drive aún no tiene: quedan pendientes de subir. Reemplazar deja ambos iguales.
