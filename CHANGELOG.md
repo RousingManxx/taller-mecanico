@@ -8,6 +8,22 @@ Todos los cambios relevantes de Torque se anotan aquí. Formato basado en [Keep 
 
 ## [Sin publicar]
 
+## [1.3.3] — 2026-10-22
+
+### Corregido (escritorio)
+- **Barra superior:** el buscador, «Nuevo», la campana y el usuario se amontonaban a la izquierda. Ahora la barra usa el mismo ancho máximo y centrado que el contenido: el buscador a la izquierda y las acciones a la derecha, alineados con la página.
+- **Menús al borde de la ventana:** los menús de «Nuevo» y del usuario salían pegados al borde derecho, lejos del botón que los abrió. Ahora se anclan justo debajo de su botón (el del usuario alineado a su borde derecho, el de «Nuevo» al izquierdo) y se cierran con un clic fuera, con Escape o tocando otra vez el botón.
+- **Búsqueda en un modal gigante:** el campo de la barra ahora es el buscador: se escribe ahí mismo y los resultados salen en un desplegable debajo, del ancho del campo. Enter abre el primer resultado y Escape cierra y limpia.
+- **Notificaciones:** se abren como desplegable bajo la campana en lugar de un modal.
+- **Paneles a todo el ancho:** una regla anti-desbordamiento para móvil pisaba el límite de 680 px de los paneles (`.sheet`), y en escritorio todos los que no son «anchos» ocupaban la pantalla completa. Se restituye el límite.
+
+### Agregado
+- Capa anclada reutilizable `Popover` (`app/src/ui/ui.tsx`), dibujada en `body`, igual que `Sheet`.
+- Recorrido E2E `app/e2e/desktop.mjs` (30 comprobaciones): alineación de la barra, anclaje de menús, desplegables de búsqueda y notificaciones, ancho de los paneles y que el móvil siga igual.
+
+### Sin cambios
+- Móvil: las notificaciones y la búsqueda siguen abriendo un panel, y las acciones rápidas siguen saliendo de la esquina.
+
 ## [1.3.2] — 2026-10-22
 
 ### Corregido
