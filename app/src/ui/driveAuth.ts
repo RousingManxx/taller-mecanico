@@ -1,11 +1,12 @@
-import { UserError } from '../services/core'
-import type { DriveEnv } from '../services/driveSync'
+import { BLOCKED, DriveError, RECONNECT, isBlockingGoogleError, type DriveEnv } from '../services/driveSync'
 
 /**
  * Autorización de Google Drive en el navegador (Google Identity Services). Sin servidor propio no hay «refresh token»:
  * el acceso dura ~1 h. Renovarlo (`prompt: ''`) abre una ventana de Google que se cierra sola si ya hay permiso, pero los
  * navegadores la bloquean si no nace de un clic del usuario (`popup_failed_to_open`). Por eso, sin clic suele fallar y la
  * interfaz renueva con el siguiente toque del usuario en cualquier parte de la app (ver `DriveSyncProvider`).
+ * Si Google responde que la aplicación no es válida (Client ID revocado, eliminado o mal configurado) falla con un
+ * `DriveError('blocked')`: la interfaz deja de intentar solo y la app sigue funcionando con sus datos locales.
  * Alcance `drive.file`: la app solo ve el archivo que ella misma creó.
  */
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
@@ -13,7 +14,6 @@ const SCOPE = 'https://www.googleapis.com/auth/drive.file'
 const MARGIN = 5 * 60_000 // se renueva 5 min antes de que venza
 const SILENT_TIMEOUT = 10_000
 
-export const RECONNECT = 'Reconecta Google Drive para seguir respaldando.'
 /** Sin `VITE_GOOGLE_CLIENT_ID` la función no se ofrece y la app funciona igual. */
 export const driveAvailable = Boolean(CLIENT_ID)
 
@@ -41,10 +41,11 @@ const fresh = () => (cached && cached.exp - MARGIN > Date.now() ? cached.value :
 function request(g: Gis, interactive: boolean): Promise<string> {
   return new Promise<string>((res, rej) => {
     const timer = interactive ? undefined : setTimeout(() => fail(), SILENT_TIMEOUT)
-    const fail = () => { clearTimeout(timer); rej(new UserError(RECONNECT)) }
+    const fail = () => { clearTimeout(timer); rej(new DriveError('reconnect', RECONNECT)) }
     g.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID!, scope: SCOPE,
       callback: (r) => {
+        if (isBlockingGoogleError(r.error)) { clearTimeout(timer); return rej(new DriveError('blocked', BLOCKED, r.error)) }
         if (r.error || !r.access_token) return fail()
         clearTimeout(timer)
         cached = { value: r.access_token, exp: Date.now() + Number(r.expires_in ?? 3600) * 1000 }
@@ -57,14 +58,14 @@ function request(g: Gis, interactive: boolean): Promise<string> {
 
 /**
  * Token vigente. `interactive` (desde un clic) puede abrir la ventana de Google; sin él solo se intenta en silencio
- * y, si no se logra, falla con `RECONNECT` para que la interfaz ofrezca reconectar.
+ * y, si no se logra, falla con `reconnect` para que la interfaz ofrezca reconectar.
  */
 export async function accessToken(o: { interactive?: boolean } = {}): Promise<string> {
-  if (!CLIENT_ID) throw new UserError('Google Drive no está configurado en esta instalación.')
+  if (!CLIENT_ID) throw new DriveError('blocked', 'Google Drive no está configurado en esta instalación.', 'sin_client_id')
   const ok = fresh()
   if (ok) return ok
   let g: Gis
-  try { g = await loadGis() } catch { throw new UserError('No hay conexión con Google Drive.') }
+  try { g = await loadGis() } catch { throw new DriveError('offline', 'No hay conexión con Google Drive.') }
   return request(g, !!o.interactive)
 }
 

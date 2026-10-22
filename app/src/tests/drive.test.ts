@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createBackup } from '../services/backup'
 import { saveUser, login } from '../services/auth'
 import { saveCustomer } from '../services/customers'
-import { checkRemote, driveFileName, getDriveState, markDirty, pullRemote, setDriveEnabled, syncNow, trackChanges, uploadBackup, type DriveEnv } from '../services/driveSync'
+import { BLOCKED, DriveError, blockDrive, checkRemote, driveFileName, getDriveState, isBlockingGoogleError, markDirty, pullRemote, setDriveEnabled, syncNow, trackChanges, unblockDrive, uploadBackup, type DriveEnv } from '../services/driveSync'
 import { world } from './helpers'
 
 interface FakeFile { id: string; name: string; content: string; appProperties: Record<string, string>; version: number; modifiedTime: string; trashed: boolean }
@@ -188,6 +188,65 @@ describe('Respaldo en Google Drive', () => {
     await syncNow(ctx, env)
     d.editRemote([...d.files.keys()][0], '{no es json')
     await expect(pullRemote(ctx, env, 'combinar')).rejects.toThrow(/JSON/)
+  })
+})
+
+describe('Errores con código y Client ID revocado, eliminado o mal configurado', () => {
+  it('cada fallo lleva un código para que la interfaz sepa qué ofrecer', async () => {
+    const { ctx } = await world()
+    const code = async (env: DriveEnv) => ((await syncNow(ctx, env).then(() => null, (x: unknown) => x)) as DriveError).code
+    expect(await code({ token: async () => 't', fetch: (async () => { throw new TypeError('Failed to fetch') }) as typeof fetch })).toBe('offline')
+    expect(await code({ token: async () => 't', fetch: (async () => new Response('{}', { status: 401 })) as typeof fetch })).toBe('session')
+    expect(await code({ token: async () => 't', fetch: (async () => new Response('{}', { status: 403 })) as typeof fetch })).toBe('http')
+    expect(await code(fakeDrive().env(async () => { throw new DriveError('reconnect', 'Reconecta Google Drive.') }))).toBe('reconnect')
+    // los errores de Drive siguen siendo errores de negocio mostrables (UserError)
+    expect(new DriveError('http', 'x')).toBeInstanceOf(Error)
+    await expect(syncNow(ctx, { token: async () => 't', fetch: (async () => new Response('{}', { status: 403 })) as typeof fetch })).rejects.toThrow(/límite de uso/)
+  })
+
+  it('clasifica los errores de Google: solo los que invalidan la aplicación bloquean', () => {
+    for (const e of ['invalid_client', 'unauthorized_client', 'deleted_client', 'disabled_client', 'invalid_request', 'invalid_scope', 'redirect_uri_mismatch', 'origin_mismatch']) expect(isBlockingGoogleError(e), e).toBe(true)
+    for (const e of ['access_denied', 'popup_closed', 'popup_failed_to_open', 'immediate_failed', undefined, '']) expect(isBlockingGoogleError(e), String(e)).toBe(false)
+  })
+
+  it('un token bloqueado detiene la sincronización sin tocar los datos locales ni perder cambios', async () => {
+    const { ctx } = await world()
+    trackChanges(ctx)
+    await saveCustomer(ctx, { name: 'Cliente Local', phone: '5551112222' })
+    const d = fakeDrive()
+    const revocado = d.env(async () => { throw new DriveError('blocked', BLOCKED, 'invalid_client') })
+    const e = (await syncNow(ctx, revocado).then(() => null, (x: unknown) => x)) as DriveError
+    expect(e.code).toBe('blocked'); expect(e.detail).toBe('invalid_client'); expect(e.message).toBe(BLOCKED)
+    blockDrive(ctx.orgId, e.detail!)       // lo que hace la interfaz al recibir el error
+    expect(getDriveState(ctx.orgId).blocked).toBe('invalid_client')
+    expect(d.files.size).toBe(0)
+
+    // la app sigue funcionando: datos intactos, cambios pendientes y copia manual disponible
+    expect(await ctx.db.customers.count()).toBe(1)
+    expect(getDriveState(ctx.orgId).dirty).toBe(true)
+    expect((await createBackup(ctx)).tables.customers).toHaveLength(1)
+  })
+
+  it('reintentar tras corregir la configuración vuelve a subir y limpia el bloqueo', async () => {
+    const { ctx } = await world()
+    trackChanges(ctx)
+    const d = fakeDrive()
+    blockDrive(ctx.orgId, 'invalid_client')
+    unblockDrive(ctx.orgId)
+    expect(getDriveState(ctx.orgId).blocked).toBeUndefined()
+    expect((await syncNow(ctx, d.env())).status).toBe('uploaded')
+    expect(d.files.size).toBe(1)
+  })
+
+  it('el bloqueo es por taller y desconectar o volver a conectar lo limpia', async () => {
+    const a = await world({ name: 'Taller A' }), b = await world({ name: 'Taller B' })
+    blockDrive(a.ctx.orgId, 'deleted_client')
+    expect(getDriveState(a.ctx.orgId).blocked).toBe('deleted_client')
+    expect(getDriveState(b.ctx.orgId).blocked).toBeUndefined()
+    setDriveEnabled(a.ctx.orgId, false)
+    expect(getDriveState(a.ctx.orgId).blocked).toBeUndefined()
+    blockDrive(a.ctx.orgId, 'deleted_client'); setDriveEnabled(a.ctx.orgId, true)
+    expect(getDriveState(a.ctx.orgId).blocked).toBeUndefined()
   })
 })
 
