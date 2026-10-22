@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14202b">
+<title>Política de privacidad · Torque</title>
+<style>
+  :root { --bg: #eef1f4; --fg: #14202b; --muted: #55626f; --card: #ffffff; --line: #d5dbe1; --accent: #0f5f8c; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0e151c; --fg: #e8edf2; --muted: #9aa7b3; --card: #16202a; --line: #2a3744; --accent: #6bb6e0; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 20px 8px; }
+  h1 { margin: 0 0 4px; font-size: 1.6rem; } h2 { margin: 24px 0 6px; font-size: 1.1rem; }
+  p, li { margin: 6px 0; } .muted { color: var(--muted); font-size: 0.9rem; }
+  a { color: var(--accent); } code { background: var(--bg); padding: 1px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="./">← Volver a Torque</a></p>
+  <div class="card">
+    <h1>Política de privacidad de Torque</h1>
+    <p class="muted">Última actualización: 21 de octubre de 2026</p>
+
+    <h2>Qué es Torque</h2>
+    <p>Torque es una aplicación web instalable (PWA) para la gestión de talleres mecánicos: clientes, vehículos, órdenes, inventario, ventas y finanzas.</p>
+
+    <h2>Dónde se guardan tus datos</h2>
+    <p>Los datos de tu taller se guardan <b>únicamente en tu propio dispositivo</b> (en el almacenamiento del navegador). Torque no tiene servidores propios que reciban, almacenen o procesen esa información, no usa herramientas de analítica ni de publicidad y no vende ni comparte datos con terceros.</p>
+
+    <h2>Respaldo opcional en Google Drive</h2>
+    <p>Si decides conectar Google Drive desde <i>Ajustes → Respaldo en Google Drive</i>, Torque te pedirá autorización con tu cuenta de Google para usar un único permiso:</p>
+    <ul>
+      <li><code>https://www.googleapis.com/auth/drive.file</code>: permite crear y actualizar <b>solo los archivos que la propia aplicación crea</b>. Torque no puede ver, listar ni leer el resto de tus archivos de Drive.</li>
+    </ul>
+    <p>Qué hace con ese permiso: crea y mantiene un archivo de respaldo con nombre fijo en tu «Mi unidad» y consulta si hay una versión más nueva. Los datos viajan directamente desde tu dispositivo a tu Google Drive; <b>el desarrollador de Torque no los recibe ni tiene acceso a ellos</b>. El archivo de respaldo es un JSON legible que incluye los datos de tu taller y los usuarios con el hash de su PIN, por lo que conviene proteger tu cuenta de Google.</p>
+    <p>El token de acceso que entrega Google se mantiene solo en la memoria del navegador y no se envía a ningún otro lugar.</p>
+
+    <h2>Uso de los datos de usuario de Google</h2>
+    <p>El uso y la transferencia a cualquier otra aplicación de la información recibida de las API de Google se apegará a la <a href="https://developers.google.com/terms/api-services-user-data-policy">Política de datos de usuario de los servicios de API de Google</a>, incluidos los requisitos de uso limitado. Los datos de Drive se usan únicamente para ofrecer la función de respaldo descrita; no se usan para publicidad, no se transfieren a terceros y ninguna persona los lee.</p>
+
+    <h2>Cómo retirar el acceso y borrar tus datos</h2>
+    <ul>
+      <li>En Torque: <i>Ajustes → Respaldo en Google Drive → Desconectar</i> (se revoca el acceso).</li>
+      <li>En Google: revisa y quita el acceso en <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+      <li>Elimina el archivo de respaldo directamente desde tu Google Drive cuando quieras.</li>
+      <li>Para borrar los datos locales, elimina los datos del sitio desde la configuración de tu navegador o desinstala la aplicación.</li>
+    </ul>
+
+    <h2>Cambios y contacto</h2>
+    <p>Si esta política cambia, se actualizará esta página con una nueva fecha. Para dudas o solicitudes, abre una incidencia en <a href="https://github.com/RousingManxx/taller-mecanico/issues">github.com/RousingManxx/taller-mecanico/issues</a>.</p>
+  </div>
+</main>
+</body>
+</html>
