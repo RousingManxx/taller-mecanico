@@ -31,6 +31,8 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
+          # Opcional: sin esta variable de repositorio la sección de Google Drive no aparece (ver app/docs/DRIVE.md).
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: app/dist
