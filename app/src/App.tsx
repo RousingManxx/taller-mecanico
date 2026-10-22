@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { HashRouter, Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { registry } from './db/db'
 import type { Permission } from './domain/permissions'
@@ -34,9 +34,12 @@ import { SheetHost, useOpen, type Sheet as SheetKind } from './ui/create'
 import { useData, type Data } from './ui/data'
 import { DriveBanner, DriveSyncProvider } from './ui/driveSync'
 import { InstallBanner } from './ui/install'
-import { SearchPanel } from './ui/search'
+import { DeskSearch, SearchPanel } from './ui/search'
 import { SessionProvider, useSession } from './ui/session'
-import { Icon, Sheet, UiProvider } from './ui/ui'
+import { Icon, Popover, Sheet, UiProvider, useMedia } from './ui/ui'
+
+/** Desde este ancho se usa la barra superior de escritorio (ver `.desk-top` en index.css). */
+const DESKTOP = '(min-width: 900px)'
 
 interface NavItem { to: string; label: string; icon: string; perm?: Permission | Permission[]; group: string; badge?: 'orders' | 'alerts' }
 const NAV: NavItem[] = [
@@ -79,56 +82,65 @@ function useEscape(on: boolean, close: () => void) {
   }, [on, close])
 }
 
+/** Acciones rápidas. Escritorio: menú anclado debajo del botón «Nuevo». Móvil: menú desde la esquina, con fondo que cierra. */
 function QuickMenu({ data, cls }: { data: Data; cls: string }) {
   const [on, setOn] = useState(false)
   const open = useOpen()
+  const desk = useMedia(DESKTOP)
+  const btn = useRef<HTMLButtonElement>(null)
   const first = useRef<HTMLButtonElement>(null)
   useEscape(on, () => setOn(false))
   useEffect(() => { if (on) first.current?.focus() }, [on])
   const items = QUICK.filter((q) => data.can(q.perm))
   if (!items.length) return null
+  const list = (
+    <>
+      {items.map((q, i) => <button key={q.k} role="menuitem" ref={i === 0 ? first : undefined} onClick={() => { setOn(false); open({ k: q.k } as SheetKind) }}><Icon n={q.icon} size={20} />{q.label}</button>)}
+      {data.can('finanzas.ver') && <><hr /><Link role="menuitem" to="/rentabilidad" onClick={() => setOn(false)}><Icon n="pie" size={20} />Consultar rentabilidad</Link></>}
+    </>
+  )
   return (
     <>
-      <button className={cls} aria-label="Acciones rápidas" aria-haspopup="menu" aria-expanded={on} onClick={() => setOn(!on)}>{cls.includes('iconbtn') ? <Icon n="plus" /> : <><Icon n="plus" size={18} />Nuevo</>}</button>
-      {on && (<>
+      <button ref={btn} className={cls} aria-label="Acciones rápidas" aria-haspopup="menu" aria-expanded={on} onClick={() => setOn(!on)}>{cls.includes('iconbtn') ? <Icon n="plus" /> : <><Icon n="plus" size={18} />Nuevo</>}</button>
+      {on && desk && <Popover anchor={btn} align="start" role="menu" className="menu" onClose={() => setOn(false)}>{list}</Popover>}
+      {on && !desk && (<>
         <div className="scrim" onClick={() => setOn(false)} />
-        <div className="menu glass topleft" role="menu">
-          {items.map((q, i) => <button key={q.k} role="menuitem" ref={i === 0 ? first : undefined} onClick={() => { setOn(false); open({ k: q.k } as SheetKind) }}><Icon n={q.icon} size={20} />{q.label}</button>)}
-          {data.can('finanzas.ver') && <><hr /><Link role="menuitem" to="/rentabilidad" onClick={() => setOn(false)}><Icon n="pie" size={20} />Consultar rentabilidad</Link></>}
-        </div>
+        <div className="menu glass topleft" role="menu">{list}</div>
       </>)}
     </>
   )
 }
 
-function AlertsSheet({ data, onClose }: { data: Data; onClose: () => void }) {
+/** Lista de alertas; la usan el panel móvil y el desplegable del escritorio. */
+function AlertsList({ data, onPick }: { data: Data; onPick: () => void }) {
   const alerts = useMemo(() => buildAlerts(data), [data])
   const nav = useNavigate()
   return (
-    <Sheet title="Notificaciones" onClose={onClose}>
+    <>
       {!alerts.length && <p className="muted">Todo en orden: no hay alertas pendientes.</p>}
       <div className="stack-sm">
-        {alerts.map((a) => <button key={a.id} className="item" onClick={() => { nav(a.to); onClose() }}><span className={`badge ${a.tone === 'info' ? 'info' : a.tone}`}>{a.tone === 'bad' ? 'Crítica' : a.tone === 'warn' ? 'Aviso' : 'Info'}</span><div className="grow"><div className="ttl">{a.title}</div><div className="sub">{a.detail}</div></div></button>)}
+        {alerts.map((a) => <button key={a.id} className="item" onClick={() => { nav(a.to); onPick() }}><span className={`badge ${a.tone === 'info' ? 'info' : a.tone}`}>{a.tone === 'bad' ? 'Crítica' : a.tone === 'warn' ? 'Aviso' : 'Info'}</span><div className="grow"><div className="ttl">{a.title}</div><div className="sub">{a.detail}</div></div></button>)}
       </div>
-    </Sheet>
+    </>
   )
 }
 
-function ProfileMenu({ data, onClose }: { data: Data; onClose: () => void }) {
+function AlertsSheet({ data, onClose }: { data: Data; onClose: () => void }) {
+  return <Sheet title="Notificaciones" onClose={onClose}><AlertsList data={data} onPick={onClose} /></Sheet>
+}
+
+/** Menú del usuario (solo escritorio): anclado debajo de su botón, alineado a su borde derecho. */
+function ProfileMenu({ data, anchor, onClose }: { data: Data; anchor: RefObject<HTMLElement | null>; onClose: () => void }) {
   const { user, logout } = useSession()
-  useEscape(true, onClose)
   return (
-    <>
-      <div className="scrim" onClick={onClose} />
-      <div className="menu glass topright" role="menu">
-        <div style={{ padding: '8px 12px' }}><b>{user.name}</b><div className="small muted">{ROLE_LABEL[user.role]}</div><div className="small muted">{data.settings.businessName}</div></div>
-        <hr />
-        <Link role="menuitem" to="/ajustes" onClick={onClose}><Icon n="gear" size={20} />Ajustes</Link>
-        <Link role="menuitem" to="/ayuda" onClick={onClose}><Icon n="info" size={20} />Guía de uso</Link>
-        <Link role="menuitem" to="/guia" onClick={onClose}><Icon n="check" size={20} />Guía de inicio</Link>
-        <button role="menuitem" onClick={() => { onClose(); logout() }}><Icon n="logout" size={20} />Cerrar sesión / cambiar de taller</button>
-      </div>
-    </>
+    <Popover anchor={anchor} align="end" role="menu" className="menu" onClose={onClose}>
+      <div style={{ padding: '8px 12px' }}><b>{user.name}</b><div className="small muted">{ROLE_LABEL[user.role]}</div><div className="small muted">{data.settings.businessName}</div></div>
+      <hr />
+      <Link role="menuitem" to="/ajustes" onClick={onClose}><Icon n="gear" size={20} />Ajustes</Link>
+      <Link role="menuitem" to="/ayuda" onClick={onClose}><Icon n="info" size={20} />Guía de uso</Link>
+      <Link role="menuitem" to="/guia" onClick={onClose}><Icon n="check" size={20} />Guía de inicio</Link>
+      <button role="menuitem" onClick={() => { onClose(); logout() }}><Icon n="logout" size={20} />Cerrar sesión / cambiar de taller</button>
+    </Popover>
   )
 }
 
@@ -152,6 +164,9 @@ function Shell() {
   const loc = useLocation()
   const nav = useNavigate()
   const [panel, setPanel] = useState<null | 'alerts' | 'profile' | 'more' | 'search'>(null)
+  const desk = useMedia(DESKTOP)
+  const bellRef = useRef<HTMLButtonElement>(null)
+  const userRef = useRef<HTMLButtonElement>(null)
   const redirected = useRef(false)
   const org = useLiveQuery(() => registry.orgs.get(ctx.orgId), [ctx.orgId])
   const alerts = useMemo(() => (data.ready ? buildAlerts(data) : []), [data])
@@ -182,10 +197,14 @@ function Shell() {
           <div className="foot">{data.settings.businessName}<br />{user.name} · {ROLE_LABEL[user.role]}</div>
         </aside>
         <header className="desk-top">
-          <div className="search"><Icon n="search" size={18} /><input type="search" placeholder="Buscar cliente, placas, folio, SKU…" aria-label="Búsqueda global" onFocus={() => setPanel('search')} readOnly /></div>
-          <QuickMenu data={data} cls="btn primary" />
-          <button className="iconbtn glass" aria-label={`Notificaciones${alerts.length ? ` (${alerts.length})` : ''}`} onClick={() => setPanel('alerts')}><Icon n="bell" />{alerts.length > 0 && <span className="dotbadge" style={crit ? undefined : { background: 'var(--warn)' }}>{alerts.length}</span>}</button>
-          <button className="iconbtn glass" aria-label="Perfil de usuario" aria-haspopup="menu" onClick={() => setPanel('profile')}><Icon n="user" /></button>
+          <div className="desk-inner">
+            <DeskSearch data={data} />
+            <div className="desk-actions">
+              <QuickMenu data={data} cls="btn primary" />
+              <button ref={bellRef} className="iconbtn glass" aria-label={`Notificaciones${alerts.length ? ` (${alerts.length})` : ''}`} aria-haspopup="true" aria-expanded={panel === 'alerts'} onClick={() => setPanel(panel === 'alerts' ? null : 'alerts')}><Icon n="bell" />{alerts.length > 0 && <span className="dotbadge" style={crit ? undefined : { background: 'var(--warn)' }}>{alerts.length}</span>}</button>
+              <button ref={userRef} className="iconbtn glass" aria-label="Perfil de usuario" aria-haspopup="menu" aria-expanded={panel === 'profile'} onClick={() => setPanel(panel === 'profile' ? null : 'profile')}><Icon n="user" /></button>
+            </div>
+          </div>
         </header>
         <div className="topbar">
           <QuickMenu data={data} cls="iconbtn glass" />
@@ -232,8 +251,10 @@ function Shell() {
           </div>
         </main>
       </div>
-      {panel === 'alerts' && <AlertsSheet data={data} onClose={() => setPanel(null)} />}
-      {panel === 'profile' && <ProfileMenu data={data} onClose={() => setPanel(null)} />}
+      {panel === 'alerts' && (desk
+        ? <Popover anchor={bellRef} align="end" className="listpop" onClose={() => setPanel(null)}><b className="pophead">Notificaciones</b><AlertsList data={data} onPick={() => setPanel(null)} /></Popover>
+        : <AlertsSheet data={data} onClose={() => setPanel(null)} />)}
+      {panel === 'profile' && <ProfileMenu data={data} anchor={userRef} onClose={() => setPanel(null)} />}
       {panel === 'more' && <MoreSheet data={data} onClose={() => setPanel(null)} />}
       {panel === 'search' && <Sheet title="Buscar" onClose={() => setPanel(null)}><SearchPanel data={data} autoFocus onPick={() => setPanel(null)} /></Sheet>}
     </SheetHost>
