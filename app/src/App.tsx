@@ -32,6 +32,7 @@ import { Welcome } from './pages/Welcome'
 import { buildAlerts } from './ui/alerts'
 import { SheetHost, useOpen, type Sheet as SheetKind } from './ui/create'
 import { useData, type Data } from './ui/data'
+import { DriveBanner, DriveSyncProvider } from './ui/driveSync'
 import { InstallBanner } from './ui/install'
 import { SearchPanel } from './ui/search'
 import { SessionProvider, useSession } from './ui/session'
@@ -198,6 +199,7 @@ function Shell() {
         </nav>
         <main className="main">
           <InstallBanner />
+          <DriveBanner />
           {org?.demo && <div className="banner info" style={{ marginBottom: 12 }}>Estás en el <b>taller de demostración</b>: todos los datos son ficticios y están separados de tus datos reales. <Link to="/ajustes">Administrar demostración</Link></div>}
           <div className="page" key={loc.pathname}>
             <Routes>
@@ -243,7 +245,7 @@ export default function App() {
     <HashRouter>
       <UiProvider>
         <SessionProvider fallback={(start) => <Welcome onStart={start} />}>
-          <Shell />
+          <DriveSyncProvider><Shell /></DriveSyncProvider>
         </SessionProvider>
       </UiProvider>
     </HashRouter>

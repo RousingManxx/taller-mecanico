@@ -17,13 +17,16 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object
 const idOf = (t: TName, r: Record<string, unknown>) => (t === 'settings' ? 'main' : (r.id as string | undefined))
 
 declare const __APP_VERSION__: string
-/** Copia completa del taller. Contiene los hashes de PIN de los usuarios: protege el archivo. */
-export async function createBackup(ctx: Ctx): Promise<BackupFile> {
+/**
+ * Copia completa del taller. Contiene los hashes de PIN de los usuarios: protege el archivo.
+ * `touch: false` no registra la fecha de «última copia» (subidas automáticas a Drive).
+ */
+export async function createBackup(ctx: Ctx, o: { touch?: boolean } = {}): Promise<BackupFile> {
   need(ctx, 'respaldo.exportar')
   const tables = {} as BackupFile['tables']
   for (const t of BACKUP_TABLES) tables[t] = (await (ctx.db as unknown as Record<string, Table>)[t].toArray()) as Record<string, unknown>[]
   const s = await ctx.db.settings.get('main')
-  await tx(ctx, async () => { if (s) await ctx.db.settings.put({ ...s, lastBackupAt: stamp(ctx) }) })
+  if (o.touch !== false) await tx(ctx, async () => { if (s) await ctx.db.settings.put({ ...s, lastBackupAt: stamp(ctx) }) })
   return { format: FORMAT, schemaVersion: SCHEMA_VERSION, orgId: ctx.orgId, orgName: s?.businessName ?? '', createdAt: stamp(ctx), appVersion: typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'test', tables }
 }
 
