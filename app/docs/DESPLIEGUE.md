@@ -8,6 +8,9 @@
 ## Respaldo y recuperación
 Los datos viven en IndexedDB del dispositivo. En Ajustes → «Copia de seguridad» descarga el JSON (`torque-backup`, `schemaVersion`) con todo el taller, incluidos los hash de PIN (guárdalo seguro). Restaurar valida estructura, versión (las más nuevas se rechazan; hay tabla de migraciones), ids duplicados, referencias y que la copia sea del mismo taller; permite **combinar** (conserva lo local) o **reemplazar** (con confirmación); es atómico. Para cambiar de dispositivo: en la pantalla de bienvenida usa «Restaurar taller desde una copia de seguridad»; recrea el taller con sus usuarios y PIN. En Ajustes solo se restaura una copia del mismo taller.
 
+### Respaldo en Google Drive (opcional)
+Sube la copia JSON a un archivo de «Mi unidad» con nombre fijo y avisa al abrir la app si Drive tiene una versión más nueva. Es opcional: sin `VITE_GOOGLE_CLIENT_ID` en la compilación la sección no aparece. **Diseño, configuración paso a paso en Google Cloud, límites (el acceso de Google dura ~1 h y se renueva con el siguiente toque) y solución de problemas: ver `docs/DRIVE.md`.** Historial de versiones: `CHANGELOG.md`.
+
 ## Integraciones (todas pendientes; ninguna simulada)
 - **CFDI**: requiere un PAC, certificados y datos fiscales; debe implementarse como módulo independiente. La app solo emite comprobantes de control interno y lo indica en cada documento.
 - **WhatsApp/SMS/correo**: la app solo ofrece enlaces `tel:`, `wa.me` y `mailto:` manuales; los envíos automáticos exigen integración configurada y consentimiento.

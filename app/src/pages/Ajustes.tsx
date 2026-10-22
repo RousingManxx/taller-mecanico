@@ -13,6 +13,7 @@ import { saveSettings, type SettingsPatch } from '../services/catalog'
 import { changeOwnPin, setLogo } from '../services/config'
 import { useOpen } from '../ui/create'
 import { download, fmtDateTime, type Data } from '../ui/data'
+import { DriveSettings } from '../ui/driveSync'
 import { compressImage, useAttachments } from '../ui/image'
 import { useSession } from '../ui/session'
 import { Badge, Empty, Field, Icon, MoneyInput, NumInput, Sheet, useBusy, useUi } from '../ui/ui'
@@ -272,7 +273,7 @@ export function Ajustes({ data }: { data: Data }) {
     <div className="stack-lg">
       <div className="page-head"><div><h1>Ajustes</h1><div className="sub">{data.settings.businessName} · {user.name} · {ROLE_LABEL[user.role]}</div></div><div className="row"><Link className="btn" to="/guia">Guía de inicio</Link><button className="btn" onClick={logout}><Icon n="logout" size={18} />Cerrar sesión</button></div></div>
       {!data.can('config.editar') && <div className="banner info">Tu rol no puede modificar la configuración del taller; puedes ver los valores vigentes.</div>}
-      <Negocio data={data} /><Impuestos data={data} /><Politicas data={data} /><Catalogos data={data} /><Usuarios data={data} /><Auditoria data={data} /><Respaldo data={data} /><Demo data={data} />
+      <Negocio data={data} /><Impuestos data={data} /><Politicas data={data} /><Catalogos data={data} /><Usuarios data={data} /><Auditoria data={data} /><Respaldo data={data} /><DriveSettings data={data} /><Demo data={data} />
       <Version />
     </div>
   )

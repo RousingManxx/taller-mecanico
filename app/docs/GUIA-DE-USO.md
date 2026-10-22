@@ -95,6 +95,7 @@ Las sesiones caducan a las 12 horas. Puedes cambiar tu PIN en Ajustes. Important
 - Ajustes → Copia de seguridad: descarga el archivo JSON con todo tu taller. Hazlo seguido (la app te lo recuerda cada 7 días). El archivo incluye los PIN protegidos: guárdalo en un lugar seguro.
 - Restaurar en el mismo taller: combinar (agrega lo que falte) o reemplazar (sustituye todo, con confirmación).
 - Nuevo dispositivo: en la pantalla de bienvenida usa «Restaurar taller desde una copia». Entras con los mismos usuarios y PIN.
+- Google Drive (si tu instalación lo tiene): Ajustes → Respaldo en Google Drive → Conectar. La copia se sube sola con un nombre fijo y, al abrir la app, te avisa si hay una versión más nueva; tú decides si traerla. Cada cierto tiempo (~1 h) Google pide renovar el acceso: toca cualquier parte de la app o el aviso; tus cambios quedan pendientes y se suben después.
 - Exportar a CSV: Ajustes o Reportes; respeta tus permisos (sin permiso de costos no salen costos).
 
 ## 10. Instalar como app y uso sin conexión

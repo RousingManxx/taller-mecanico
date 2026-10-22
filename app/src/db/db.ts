@@ -41,6 +41,8 @@ export class OrgDB extends Dexie {
   ops!: Table<OpRecord, string>
 
   orgId: string
+  /** Se invoca en cada escritura de datos de negocio (no en `ops`); lo usa la sincronización con Drive para saber que hay cambios sin subir. */
+  onChange: (() => void) | null = null
   /** Solo la restauración de una copia completa puede reescribir tablas históricas (dentro de una transacción atómica). */
   restoring = false
   constructor(orgId: string) {
@@ -75,6 +77,11 @@ export class OrgDB extends Dexie {
       attachments: 'id, ownerId',
       ops: 'key',
     })
+    for (const t of this.tables) {
+      if (t.name === 'ops') continue
+      const changed = () => { this.onChange?.() }
+      t.hook('creating', changed); t.hook('updating', changed); t.hook('deleting', changed)
+    }
     // Tablas de solo anexar: el historial no se edita ni se borra; los errores se corrigen con movimientos compensatorios.
     for (const t of [this.movements, this.ledger, this.audit, this.priceHistory] as Table[]) {
       t.hook('updating', () => { if (!this.restoring) throw new Error('Los registros históricos no se pueden modificar: registra un movimiento compensatorio.') })

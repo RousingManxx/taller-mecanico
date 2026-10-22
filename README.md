@@ -14,6 +14,7 @@ npm test               # 80 pruebas (Vitest)
 npx tsc -b             # tipos
 npm run build          # producción en app/dist
 ```
+Historial de versiones: `CHANGELOG.md`. Respaldo en Google Drive (opcional): `app/docs/DRIVE.md`.
 Guía de uso completa: `app/docs/GUIA-DE-USO.md` (también dentro de la app: menú del perfil → Guía de uso).
 
 Al abrir, elige **Crear mi taller** o **Explorar con datos de demostración** (taller ficticio y separado, PIN de todos los usuarios: `1234`).
